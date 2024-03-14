@@ -13,7 +13,7 @@ public class LevelTemplates : MonoBehaviour
     public TMP_InputField tColumns;
     public TMP_InputField tRows;
     
-    public Box box;
+    public BoxManager box;
     public SpriteRenderer panel;
 
     public RectTransform PanelJelly;
@@ -38,7 +38,7 @@ public class LevelTemplates : MonoBehaviour
         CreateGrid(rows,columns, panel, box);
     }
 
-    private void CreateGrid(int rows, int columns,SpriteRenderer Panel,Box  box)
+    private void CreateGrid(int rows, int columns,SpriteRenderer Panel,BoxManager  box)
     {
          SpriteRenderer  sr = box.GetComponent<SpriteRenderer>();
          BoxCollider2D rg = box.GetComponent<BoxCollider2D>();
@@ -89,7 +89,7 @@ public class LevelTemplates : MonoBehaviour
                 {
                     BoxInfo bf = new BoxInfo();
                     string name = "BOX1 "+(y.ToString()) + "," + x.ToString();
-                    Box box = GameObject.Find(name).GetComponent<Box>();
+                    BoxManager box = GameObject.Find(name).GetComponent<BoxManager>();
                     if (box != null && box.subType != (int) BoxSubType.JellyRandom)
                     {
                         bf.subType = (BoxSubType) box.subType;
@@ -107,7 +107,7 @@ public class LevelTemplates : MonoBehaviour
                     
                     if (gm != null)
                     {
-                        box = gm.GetComponent<Box>();
+                        box = gm.GetComponent<BoxManager>();
                         bf.subType = (BoxSubType) box.subType;
                         bf.x = x;
                         bf.y = y;
@@ -123,7 +123,7 @@ public class LevelTemplates : MonoBehaviour
                     
                     if (gm != null)
                     {
-                        box = gm.GetComponent<Box>();
+                        box = gm.GetComponent<BoxManager>();
                         bf.subType = (BoxSubType) box.subType;
                         bf.x = x;
                         bf.y = y;
@@ -171,7 +171,7 @@ public class LevelTemplates : MonoBehaviour
                 if (gm1)
                 {
                     
-                    Box box1 = gm1.GetComponent<Box>();
+                    BoxManager box1 = gm1.GetComponent<BoxManager>();
                     SpriteRenderer sr1 = gm1.GetComponent<SpriteRenderer>();
                     box1.subType = (int) bif.subType;
                     sr1.sprite = GetSprite(bif.subType);
@@ -187,7 +187,7 @@ public class LevelTemplates : MonoBehaviour
                     string name2 = "BOX2 " +(bif.y.ToString()) + "," + bif.x.ToString();
                     GameObject gm2 = Instantiate(gm1, gm1.transform.position, gm1.transform.rotation, gm1.transform.parent);
 
-                    Box box2 = gm2.GetComponent<Box>();
+                    BoxManager box2 = gm2.GetComponent<BoxManager>();
                     SpriteRenderer sr2 = gm2.GetComponent<SpriteRenderer>();
                     box2.subType = (int) bif.subType;
                     sr2.sprite = GetSprite(bif.subType);

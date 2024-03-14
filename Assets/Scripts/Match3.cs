@@ -5,7 +5,7 @@ using DG.Tweening;
 
 public class Match3:MonoBehaviour
 {
-    public Jelly PrefabJelly;
+    public Box PrefabJelly;
     private FileData file;
     private int rows, columns;
     GridLayer gridLayer;
@@ -125,12 +125,12 @@ public class Match3:MonoBehaviour
     }
 
     
-    private Jelly createJelly(Background background, BoxSubType subType)
+    private Box createJelly(Background background, BoxSubType subType)
     {
         GameObject panel = GameObject.Find("Panel");
             if (background)
             {
-                Jelly jelly = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, panel.transform);
+                Box jelly = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, panel.transform);
                 
                 SpriteRenderer sr3 = jelly.GetComponent<SpriteRenderer>();
                 sr3.sprite = file.GetSprite(subType);
@@ -146,7 +146,7 @@ public class Match3:MonoBehaviour
             return null;
     }
 
-    public Jelly NewJellyRandom(Background background)
+    public Box NewJellyRandom(Background background)
     {
 
           BoxSubType subType = (BoxSubType) Random.Range((int) BoxSubType.JellyRed, (int) BoxSubType.JellyOrange+1);

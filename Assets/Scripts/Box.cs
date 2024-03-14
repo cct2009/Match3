@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 using System.Linq;
 
-public class Jelly : MonoBehaviour
+public class Box : MonoBehaviour
 {
     public bool shortModule=true;
     public BoxSubType subType;
@@ -106,9 +106,9 @@ public class Jelly : MonoBehaviour
         Destroy(gameObject,1f);
     }
 
-    public void  AnimationMatch(List<Jelly> list)
+    public void  AnimationMatch(List<Box> list)
     {
-        foreach(Jelly jelly in list)
+        foreach(Box jelly in list)
         {
             jelly.transform.DOScale(0,0.5f);
         }
@@ -116,7 +116,7 @@ public class Jelly : MonoBehaviour
 
     }
 
-    public void DrawBorder(List<Jelly> list,LineRenderer lr)
+    public void DrawBorder(List<Box> list,LineRenderer lr)
     {
         int min, max;
         lr.sortingOrder  = 4;
@@ -130,7 +130,7 @@ public class Jelly : MonoBehaviour
         {
             min = max = list[0].background.pos.y;
 
-            foreach(Jelly jelly in list)
+            foreach(Box jelly in list)
             {
                 if (jelly.background.pos.y < min) min = jelly.background.pos.y;
                 if (jelly.background.pos.y > max) max = jelly.background.pos.y;
@@ -151,7 +151,7 @@ public class Jelly : MonoBehaviour
         {
             min = max = list[0].background.pos.x;
 
-            foreach(Jelly jelly in list)
+            foreach(Box jelly in list)
             {
                 if (jelly.background.pos.x < min) min = jelly.background.pos.x;
                 if (jelly.background.pos.x > max) max = jelly.background.pos.x;
@@ -170,11 +170,11 @@ public class Jelly : MonoBehaviour
 //            lr.SetPosition(i,ly.transform.position);
 
     }
-   void PrintLayerList(List<Jelly> list,string pos)
+   void PrintLayerList(List<Box> list,string pos)
    {
         string s = pos + " "+ list.Count+"-";
         int i =0;
-        foreach(Jelly jelly in list)
+        foreach(Box jelly in list)
         {
             s += jelly.subType + "["+ jelly + "],";
             i++;
@@ -183,9 +183,9 @@ public class Jelly : MonoBehaviour
         Debug.Log(s);
    }
 
-    public bool checkMatch(out List<Jelly> matchList)
+    public bool checkMatch(out List<Box> matchList)
     {
-        List<Jelly> list1, list2;
+        List<Box> list1, list2;
         list1 = matchAlong(Vector2Int.left, Vector2Int.right);
         list2 = matchAlong(Vector2Int.up, Vector2Int.down);
         if (list1.Count >= 2 || list2.Count >= 2)
@@ -215,18 +215,18 @@ public class Jelly : MonoBehaviour
         matchList = list1;
         return false;
     }
-    private List<Jelly> matchAlong(Vector2Int direction1, Vector2Int direction2)
+    private List<Box> matchAlong(Vector2Int direction1, Vector2Int direction2)
     {
         return matchOn(direction1).
                     Union(matchOn(direction2)).Distinct().ToList();
     }
-    private List<Jelly> matchOn(Vector2Int direction)
+    private List<Box> matchOn(Vector2Int direction)
     {
-        List<Jelly> matchList = new List<Jelly>();
+        List<Box> matchList = new List<Box>();
         Vector2Int checkPos = background.pos+direction;
         while (ValidPos(checkPos))
         {
-            Jelly  checkItem = backgrounds[checkPos.x,checkPos.y].jelly;
+            Box  checkItem = backgrounds[checkPos.x,checkPos.y].jelly;
             if (checkItem == null) break;
             if (subType != checkItem.subType) break;
             matchList.Add(checkItem);

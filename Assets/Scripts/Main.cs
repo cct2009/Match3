@@ -91,7 +91,7 @@ public class Main : MonoBehaviour
                 if (hit.transform != null)
                 {
                     background = hit.transform.GetComponent<Background>();
-                    Debug.Log("Hit "+background.pos+": Data "+gridLayer.backgrounds[background.pos.x, background.pos.y] );
+                 //   Debug.Log("Hit "+background.pos+": Data "+gridLayer.backgrounds[background.pos.x, background.pos.y] );
 
                 }
 
@@ -117,7 +117,7 @@ public class Main : MonoBehaviour
                     swipeDirection = Vector2Int.right;
                 }
                 programState = ProgramState.Animation;
-                Debug.Log(background.jelly);
+            //    Debug.Log(background.jelly);
                 StartCoroutine(background.SwitchItem(swipeDirection));
                     
 

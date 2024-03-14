@@ -65,7 +65,7 @@ public class BoxData
     public List<BoxInfo> layer3;
 }
 
-public class Box : MonoBehaviour
+public class BoxManager : MonoBehaviour
 {
     public Image img;
     public int subType;
@@ -87,14 +87,14 @@ private void Update() {
             ShowBoxDetails();
             BoxSubType curSubType = (BoxSubType) int.Parse(subTypeIn.text);
             if (GetSubTypePos(curSubType) >= 0) return;
-            Box oldBox = GetComponent<Box>();
+            BoxManager oldBox = GetComponent<BoxManager>();
             switch(curSubType)
             {
                 
                 case BoxSubType.ArmerChain:
                 case BoxSubType.ArmerIce:
                     GameObject gm2 = Instantiate(transform.gameObject, transform.position,Quaternion.identity, transform.parent.transform);
-                    Box box1 = gm2.GetComponent<Box>();
+                    BoxManager box1 = gm2.GetComponent<BoxManager>();
                     box1.level = oldBox.level + 1;
                     box1.subType = (int) curSubType;
                     gm2.name = "BOX"+box1.level.ToString()+ oldBox.name.Substring(4);
@@ -130,7 +130,7 @@ int GetSubTypePos(BoxSubType subType)
         gm = GameObject.Find(name);
         if (gm)
         {   
-            Box box1 = gm.GetComponent<Box>();
+            BoxManager box1 = gm.GetComponent<BoxManager>();
             if (box1.subType == (int) subType)
             {
                 return i;
@@ -149,17 +149,17 @@ void ShowBoxDetails()
     {
         SpriteRenderer sr1,sr2;
         GameObject gm;
-        Box box1,box2;
+        BoxManager box1,box2;
 
         name = "BOX"+ i.ToString() + name.Substring(4);
       
         gm = GameObject.Find(name);
         string name2 = "BOX" +i.ToString();
         sr2 = GameObject.Find(name2).GetComponent<SpriteRenderer>();
-        box2 = GameObject.Find(name2).GetComponent<Box>();
+        box2 = GameObject.Find(name2).GetComponent<BoxManager>();
         if (gm)
         {   
-            box1 = gm.GetComponent<Box>();
+            box1 = gm.GetComponent<BoxManager>();
             sr1 = gm.GetComponent<SpriteRenderer>();
             if (sr2 != null)
             {

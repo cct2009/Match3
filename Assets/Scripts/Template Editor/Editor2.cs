@@ -10,7 +10,7 @@ public class Editor2 : MonoBehaviour
 {
     public MatchPanel panel;
     public FileData  file;
-    public Jelly PrefabJelly;
+    public Box PrefabJelly;
     public TMP_Text subTypeIn;    
     public TMP_InputField version;
     private BoxData boxData;
@@ -89,9 +89,9 @@ public class Editor2 : MonoBehaviour
         }
     }
    
-    private Jelly createJelly(Background background, BoxSubType subType)
+    private Box createJelly(Background background, BoxSubType subType)
     {
-        Jelly jelly;
+        Box jelly;
             if (background.jelly == null)
                  jelly = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, background.transform);
             else    
@@ -136,7 +136,7 @@ public class Editor2 : MonoBehaviour
                     Background background = backgrounds[x,y];
                     if (background.jelly)
                     {
-                        Jelly jelly = background.jelly;
+                        Box jelly = background.jelly;
                         bf.subType = jelly.subType;
                         bf.x = x;
                         bf.y = y;

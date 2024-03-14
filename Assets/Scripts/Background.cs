@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters;
 public class Background : MonoBehaviour
 {
     public Vector2Int pos;
-    public Jelly jelly;
+    public Box jelly;
     public Vector2Int flow;
     private float speed = 0.05f;
     public bool shortModule = true;
@@ -36,7 +36,7 @@ public class Background : MonoBehaviour
             SwapPosition(background2);    
             yield return new WaitForSeconds(0.3f);
 
-            List<Jelly> matchList1, matchList2;
+            List<Box> matchList1, matchList2;
 
             Debug.Log("Jelly="+jelly+" background2.jelly="+background2.jelly);
             bool jelly1Match = jelly.checkMatch(out matchList1);
@@ -56,7 +56,7 @@ public class Background : MonoBehaviour
             }
             else
             {
-                List<Jelly> matchList = new List<Jelly>();
+                List<Box> matchList = new List<Box>();
                 if (jelly1Match)
                     matchList = matchList.Union(matchList1).ToList();
                 if (jelly2Match)
@@ -73,7 +73,7 @@ public class Background : MonoBehaviour
 
     public void SwapPosition(Background background2)
     {
-        Jelly temp = jelly;
+        Box temp = jelly;
         jelly = background2.jelly;
         background2.jelly = temp;
         
@@ -89,7 +89,7 @@ public class Background : MonoBehaviour
             yield return canMoveBackground.FillBlank(blankBackground);
         }
         FillInBlank();
-        List<Jelly> list = new List<Jelly>();
+        List<Box> list = new List<Box>();
         Background background;
         if (CanMatchJellys(out background,out list))
         {
@@ -119,7 +119,7 @@ public class Background : MonoBehaviour
         }
     }
 
-    bool CanMatchJellys(out Background background, out List<Jelly> list)
+    bool CanMatchJellys(out Background background, out List<Box> list)
     {
         for (int y = 0; y < gridLayer.maxY; y++)
         {
@@ -185,11 +185,11 @@ Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2I
         
     }
 
-    public void DestroyMatch(List<Jelly> list)
+    public void DestroyMatch(List<Box> list)
     {
         List<Background> bList = new List<Background>();
         jelly.AnimationMatch(list);
-        foreach(Jelly jelly in list)
+        foreach(Box jelly in list)
         {
             bList.Add(this);
             jelly.DestoryJelly();
