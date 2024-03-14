@@ -23,7 +23,7 @@ public class Match3:MonoBehaviour
     }
 
     private void Start() {
-        gridLayer = Main.Instance.gridLayer;
+        gridLayer = Global.Instance.gridLayer;
     }
 
     public void LoadDirection(int DirectionVersion)

@@ -574,6 +574,7 @@ GameObject:
   - component: {fileID: 332488531}
   - component: {fileID: 332488533}
   - component: {fileID: 332488534}
+  - component: {fileID: 332488535}
   m_Layer: 0
   m_Name: Editor2
   m_TagString: Untagged
@@ -667,9 +668,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panel: {fileID: 1753168909}
   file: {fileID: 332488533}
-  PrefabJelly: {fileID: 8891583316880175772, guid: 6bfeb9240c6c1d64d86a5ffd4a24b957, type: 3}
+  PrefabJelly: {fileID: 8891583316880175772, guid: cc1ef28203910e64a9a9ae2c4c01fac5, type: 3}
   subTypeIn: {fileID: 1982039062}
   version: {fileID: 144656370}
+--- !u!114 &332488535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332488529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fe8a9e5200f5e4bb9245ce4c4ca17f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  file: {fileID: 332488533}
 --- !u!1 &338042525
 GameObject:
   m_ObjectHideFlags: 0
@@ -2121,7 +2135,7 @@ MonoBehaviour:
   panel: {fileID: 1753168910}
   square1: {fileID: 21300000, guid: 6254ce617306dbb46b4cbdb6835d56d4, type: 3}
   square2: {fileID: 21300000, guid: be120d2de2c57ae48b095e75a71493b6, type: 3}
-  PrefabBackground: {fileID: 5028306302427069953, guid: 77bd57d528404914eb9f19ec2e4f4af1, type: 3}
+  PrefabBackground: {fileID: 5028306302427069953, guid: 12ee1f438cc371e449b191a5677f6e06, type: 3}
   percentWidth: 90
 --- !u!212 &1753168910
 SpriteRenderer:

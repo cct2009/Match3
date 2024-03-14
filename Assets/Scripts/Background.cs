@@ -5,22 +5,20 @@ using DG.Tweening;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
 
+
 public class Background : MonoBehaviour
 {
     public Vector2Int pos;
     public Box jelly;
     public Vector2Int flow;
     private float speed = 0.05f;
-    public bool shortModule = true;
+    
     GridLayer gridLayer;
     Background[,] backgrounds;
     
     private void Start() {
-        if (!shortModule)
-        {
-            gridLayer = Main.Instance.gridLayer;
-            backgrounds = gridLayer.backgrounds; 
-        }
+        gridLayer = Global.Instance.gridLayer;
+        backgrounds = gridLayer.backgrounds; 
                
     }
 
@@ -38,11 +36,10 @@ public class Background : MonoBehaviour
 
             List<Box> matchList1, matchList2;
 
-            Debug.Log("Jelly="+jelly+" background2.jelly="+background2.jelly);
             bool jelly1Match = jelly.checkMatch(out matchList1);
             bool jelly2Match = background2.jelly.checkMatch(out matchList2);
-            if (jelly1Match) jelly.DrawBorder(matchList1,Main.Instance.lr1);
-            if (jelly2Match) background2.jelly.DrawBorder(matchList2,Main.Instance.lr2);
+            // if (jelly1Match) jelly.DrawBorder(matchList1,Main.Instance.lr1);
+            // if (jelly2Match) background2.jelly.DrawBorder(matchList2,Main.Instance.lr2);
 
             if (!jelly1Match && !jelly2Match)
             { 
@@ -113,7 +110,7 @@ public class Background : MonoBehaviour
             {
                 background = backgrounds[x,y];
                 if (background.jelly == null) {
-                    background.jelly = Main.Instance.match32.NewJellyRandom(background);
+                    background.jelly = Main.Instance.match3.NewJellyRandom(background);
                 }
             }
         }

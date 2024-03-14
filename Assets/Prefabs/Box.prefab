@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8891583316880175772}
   - component: {fileID: 3586292709251699196}
   m_Layer: 0
-  m_Name: Jelly Short
+  m_Name: Box
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485185631e8abb240ab87412faa400bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shortModule: 1
+  shortModule: 0
   subType: 0
   background: {fileID: 0}
 --- !u!61 &3586292709251699196

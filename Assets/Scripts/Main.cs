@@ -23,11 +23,12 @@ public class Main : MonoBehaviour
 
     public static Main Instance;
     public MatchPanel matchPanel;
-    public Match3 match32;
-    public FileData file;
+    public Match3 match3;
+  
+    public Global global;
     public LineRenderer lr1, lr2;
     public ProgramState programState;
-    public GridLayer gridLayer;
+    private GridLayer gridLayer;
     public int DirectionVersion=1;
     
     private void Awake() {
@@ -35,23 +36,17 @@ public class Main : MonoBehaviour
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        if (!file.OnLoadData()) {
-            Debug.Log("Can't Load Data File");
-            return;
-        }
-        gridLayer = new GridLayer();
-        gridLayer.backgrounds = new Background[file.boxData.rows, file.boxData.columns];
-        gridLayer.maxX = file.boxData.columns;
-        gridLayer.maxY = file.boxData.rows;
+        gridLayer = Global.Instance.gridLayer;
 
     }
     void Start()
     {
+
         matchPanel.CreateGrid(gridLayer);
 
-        match32.Init(file);
-        match32.LoadJelly();
-        match32.LoadDirection(DirectionVersion);
+        match3.Init(global.file);
+        match3.LoadJelly();
+        match3.LoadDirection(DirectionVersion);
         
         programState = ProgramState.InitData;
         

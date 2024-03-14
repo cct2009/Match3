@@ -7,96 +7,17 @@ using System.Linq;
 
 public class Box : MonoBehaviour
 {
-    public bool shortModule=true;
     public BoxSubType subType;
     GridLayer gridLayer;
     Background[,] backgrounds;
     public Background background;
     
     private void Start() {
-        if (!shortModule)
-        {
-            gridLayer = Main.Instance.gridLayer;
+            gridLayer = Global.Instance.gridLayer;
             backgrounds = gridLayer.backgrounds;    
-
-        }
     }
 
     
-  
-
-    // Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
-    // static int count = 20;
-    // void FillJellyInBlank(List<Background> list)
-    // {
-    //     Background bBackground;
-    //     List<Background> bBackgrounds = new List<Background>();
-    //     foreach(Background background in list)
-    //     {
-    //         if (FillJellyInBlank(background,out bBackground))
-    //             bBackgrounds.Add(bBackground);
-    //     }
-    //     // ลบอันที่ถูกแทนที่แล้วออก
-    //     List<Background> movedList = new List<Background>();
-    //     foreach(Background background in list)
-    //     {
-    //         if (background.jelly)
-    //             movedList.Add(background);
-
-    //     }
-    //     list = list.Except(movedList).ToList();
-    //     list = list.Union(bBackgrounds).ToList();
-    //     count--;
-    //     if (count > 0)
-    //     {
-    //         FillJellyInBlank(list);
-    //     }
-            
-    // }
-
-    
-    // bool FillJellyInBlank(Background background,out Background bBackground)
-    // {
-    //     Vector2Int pos = background.pos;
-    //     foreach(Vector2Int dir in dirs)
-    //     {
-    //         Vector2Int pos1 = pos+dir;   // อันที่อยู่ตำแหน่งซ้าย ขวา บน ล่าง
-    //         if (ValidPos(pos1)) // ต้องอยู่ในกริด
-    //         {
-    //             Background canMoveBackground = backgrounds[pos1.x,pos1.y];
-    //             if (canMoveBackground.jelly)  // ต้องไม่ใช่อันว่าง
-    //             {
-    //                 Vector2Int destPos = pos1+ canMoveBackground.flow; // บวกกับทิศทาง flow
-    //                 if (ValidPos(destPos) &&  destPos == pos) // ถ้าเท่ากันแสดงว่า ไหลจากตำแหน่ง pos1 มาที่ destPos
-    //                 {   
-    //                     bBackground = canMoveBackground;
-    //                     canMoveBackground.jelly.MoveToBlank(destPos);
-    //                     return true;
-
-    //                 }
-
-    //             }
-
-    //         }
-    //     }
-    //     bBackground = null;
-    //     return false;
-    // }
-
-    // void MoveToBlank(Vector2Int destPos) 
-    // { // ย้าย jelly ไปที่ตำแหน่ง destPos 
-    //     Background background2 = backgrounds[destPos.x, destPos.y];
-    // //    if (background2.jelly != null) yield return null; // ตำแหน่งที่ย้ายไป ต้องเป็น blank
-    //     transform.DOMove(background2.transform.position, 0.3f);
-
-        
-    //     background2.jelly =  this;
-    //     background = background2;
-    //     background.jelly = null;
-
-    // }
-    
-
 
     public void DestoryJelly()
     {
@@ -125,7 +46,7 @@ public class Box : MonoBehaviour
         lr.positionCount = 5;
 
         SpriteRenderer sr = backgrounds[list[0].background.pos.x,list[0].background.pos.y].GetComponent<SpriteRenderer>();
-        Debug.Log("Bound size:"+sr.bounds.size.x+","+sr.bounds.size.y);
+
         if (list[0].background.pos.x == list[1].background.pos.x) // vertical border
         {
             min = max = list[0].background.pos.y;
@@ -135,7 +56,6 @@ public class Box : MonoBehaviour
                 if (jelly.background.pos.y < min) min = jelly.background.pos.y;
                 if (jelly.background.pos.y > max) max = jelly.background.pos.y;
             }
-            Debug.Log("From X:" + list[0].background.pos.x + " To Y:"+ min+","+max);
             Vector3 point1 = backgrounds[list[0].background.pos.x, min].transform.position-new Vector3(sr.bounds.size.x/2,sr.bounds.size.y/2,0);
             Vector3 point2 = backgrounds[list[0].background.pos.x, max].transform.position-new Vector3(sr.bounds.size.x/2,-sr.bounds.size.y/2,0);
             lr.SetPosition(0,point1);
@@ -240,6 +160,80 @@ public class Box : MonoBehaviour
         if (pos.x >= gridLayer.maxX || pos.y >= gridLayer.maxY) return false;
         return true;
     }
+
+  
+
+    // Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
+    // static int count = 20;
+    // void FillJellyInBlank(List<Background> list)
+    // {
+    //     Background bBackground;
+    //     List<Background> bBackgrounds = new List<Background>();
+    //     foreach(Background background in list)
+    //     {
+    //         if (FillJellyInBlank(background,out bBackground))
+    //             bBackgrounds.Add(bBackground);
+    //     }
+    //     // ลบอันที่ถูกแทนที่แล้วออก
+    //     List<Background> movedList = new List<Background>();
+    //     foreach(Background background in list)
+    //     {
+    //         if (background.jelly)
+    //             movedList.Add(background);
+
+    //     }
+    //     list = list.Except(movedList).ToList();
+    //     list = list.Union(bBackgrounds).ToList();
+    //     count--;
+    //     if (count > 0)
+    //     {
+    //         FillJellyInBlank(list);
+    //     }
+            
+    // }
+
+    
+    // bool FillJellyInBlank(Background background,out Background bBackground)
+    // {
+    //     Vector2Int pos = background.pos;
+    //     foreach(Vector2Int dir in dirs)
+    //     {
+    //         Vector2Int pos1 = pos+dir;   // อันที่อยู่ตำแหน่งซ้าย ขวา บน ล่าง
+    //         if (ValidPos(pos1)) // ต้องอยู่ในกริด
+    //         {
+    //             Background canMoveBackground = backgrounds[pos1.x,pos1.y];
+    //             if (canMoveBackground.jelly)  // ต้องไม่ใช่อันว่าง
+    //             {
+    //                 Vector2Int destPos = pos1+ canMoveBackground.flow; // บวกกับทิศทาง flow
+    //                 if (ValidPos(destPos) &&  destPos == pos) // ถ้าเท่ากันแสดงว่า ไหลจากตำแหน่ง pos1 มาที่ destPos
+    //                 {   
+    //                     bBackground = canMoveBackground;
+    //                     canMoveBackground.jelly.MoveToBlank(destPos);
+    //                     return true;
+
+    //                 }
+
+    //             }
+
+    //         }
+    //     }
+    //     bBackground = null;
+    //     return false;
+    // }
+
+    // void MoveToBlank(Vector2Int destPos) 
+    // { // ย้าย jelly ไปที่ตำแหน่ง destPos 
+    //     Background background2 = backgrounds[destPos.x, destPos.y];
+    // //    if (background2.jelly != null) yield return null; // ตำแหน่งที่ย้ายไป ต้องเป็น blank
+    //     transform.DOMove(background2.transform.position, 0.3f);
+
+        
+    //     background2.jelly =  this;
+    //     background = background2;
+    //     background.jelly = null;
+
+    // }
+    
 
 
     

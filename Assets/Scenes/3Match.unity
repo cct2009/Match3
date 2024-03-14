@@ -132,7 +132,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 332488531}
-  - component: {fileID: 332488533}
   - component: {fileID: 332488535}
   - component: {fileID: 332488534}
   m_Layer: 0
@@ -157,13 +156,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &332488533
+--- !u!114 &332488534
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 332488529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f2f707c3d76cd5439a460ba9ef19d13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  matchPanel: {fileID: 1753168909}
+  match3: {fileID: 332488535}
+  global: {fileID: 665160100}
+  lr1: {fileID: 1325001882}
+  lr2: {fileID: 1983304118}
+  programState: 0
+  DirectionVersion: 1
+--- !u!114 &332488535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332488529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90bcc4d8a5d62a146a6c8d5b6cf9d885, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PrefabJelly: {fileID: 8891583316880175772, guid: cc1ef28203910e64a9a9ae2c4c01fac5, type: 3}
+--- !u!1 &665160098
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 665160101}
+  - component: {fileID: 665160100}
+  - component: {fileID: 665160099}
+  m_Layer: 0
+  m_Name: Global
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &665160099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665160098}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2cd246c9c3dec546a82d938aeea5b41, type: 3}
@@ -214,38 +263,34 @@ MonoBehaviour:
     sr: {fileID: 21300000, guid: 92d0e05255a550d4fb5bdd2c61a3a1fc, type: 3}
   - subType: 103
     sr: {fileID: 21300000, guid: 02982d0196f16cc4cae51255ca4d4119, type: 3}
---- !u!114 &332488534
+--- !u!114 &665160100
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 332488529}
+  m_GameObject: {fileID: 665160098}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f2f707c3d76cd5439a460ba9ef19d13, type: 3}
+  m_Script: {fileID: 11500000, guid: 46fe8a9e5200f5e4bb9245ce4c4ca17f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  matchPanel: {fileID: 1753168909}
-  match32: {fileID: 332488535}
-  file: {fileID: 332488533}
-  lr1: {fileID: 1325001882}
-  lr2: {fileID: 1983304118}
-  programState: 0
-  DirectionVersion: 1
---- !u!114 &332488535
-MonoBehaviour:
+  file: {fileID: 665160099}
+--- !u!4 &665160101
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 332488529}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90bcc4d8a5d62a146a6c8d5b6cf9d885, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PrefabJelly: {fileID: 8891583316880175772, guid: cc1ef28203910e64a9a9ae2c4c01fac5, type: 3}
+  m_GameObject: {fileID: 665160098}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 441.46606, y: 1391.0177, z: -3.3088796}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &758208845
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,3 +766,4 @@ SceneRoots:
   - {fileID: 332488531}
   - {fileID: 1325001883}
   - {fileID: 1983304119}
+  - {fileID: 665160101}
