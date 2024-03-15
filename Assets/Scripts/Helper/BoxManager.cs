@@ -26,6 +26,8 @@ public enum BoxSubType
     JellyGreen = 12,
     JellyBlue = 13,
     JellyOrange = 14,
+    JellyPink =15,
+    JellyCyan = 16,
 
 
 
@@ -38,6 +40,7 @@ public enum BoxSubType
     ObstructWood = 31,
     ObstructPenguine = 32,
     ObstructStone = 33,
+    ObstructBread = 34,
 
     ArmerIce = 41,
     ArmerChain = 42,

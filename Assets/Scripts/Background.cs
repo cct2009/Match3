@@ -4,17 +4,18 @@ using UnityEngine;
 using DG.Tweening;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
+using System.Security.Cryptography;
+using Unity.VisualScripting;
 
 
 public class Background : MonoBehaviour
 {
     public Vector2Int pos;
-    public Box jelly;
+    public Box box;
     public Vector2Int flow;
-    private float speed = 0.05f;
     
-    GridLayer gridLayer;
-    Background[,] backgrounds;
+    static GridLayer gridLayer;
+    static Background[,] backgrounds;
     
     private void Start() {
         gridLayer = Global.Instance.gridLayer;
@@ -29,76 +30,75 @@ public class Background : MonoBehaviour
         {
             Background background2 = backgrounds[item2Pos.x, item2Pos.y];
             
-            jelly.transform.DOMove(background2.transform.position,0.3f).SetEase(Ease.OutCubic);
-            background2.jelly.transform.DOMove(transform.position, 0.3f).SetEase( Ease.OutCubic);
+            box.transform.DOMove(background2.transform.position,0.3f).SetEase(Ease.OutCubic);
+            background2.box.transform.DOMove(transform.position, 0.3f).SetEase( Ease.OutCubic);
             SwapPosition(background2);    
             yield return new WaitForSeconds(0.3f);
 
-            List<Box> matchList1, matchList2;
+            List<MatchInfo> mifList = new List<MatchInfo>();
+            box.checkJellyMatch(ref mifList);
+            background2.box.checkJellyMatch(ref mifList);
 
-            bool jelly1Match = jelly.checkMatch(out matchList1);
-            bool jelly2Match = background2.jelly.checkMatch(out matchList2);
-            // if (jelly1Match) jelly.DrawBorder(matchList1,Main.Instance.lr1);
-            // if (jelly2Match) background2.jelly.DrawBorder(matchList2,Main.Instance.lr2);
-
-            if (!jelly1Match && !jelly2Match)
-            { 
-                
+            if (mifList.Count == 0)
+            {
                 SwapPosition(background2);  
-                jelly.transform.DOMove(transform.position,0.3f).SetEase(Ease.OutCubic);
-                background2.jelly.transform.DOMove(background2.transform.position, 0.3f).SetEase( Ease.OutCubic);
-                
-
+                box.transform.DOMove(transform.position,0.3f).SetEase(Ease.OutCubic);
+                background2.box.transform.DOMove(background2.transform.position, 0.3f).SetEase( Ease.OutCubic);
                 yield return new WaitForSeconds(0.3f);
             }
             else
             {
-                List<Box> matchList = new List<Box>();
-                if (jelly1Match)
-                    matchList = matchList.Union(matchList1).ToList();
-                if (jelly2Match)
-                    matchList = matchList.Union(matchList2).ToList();
-                DestroyMatch(matchList); // ทำลายทั้งหมดในครั้งเดียวจะได้ไม่มี wait animation หลายครั้ง
-                
-                yield return FlowJellyToBlank();
-            }
-        } 
+                yield return DestroyMatch(mifList); 
+                    
+                yield return FlowBoxToBlank();
 
+            }
+            
+        } 
+        ResetBoxState();
         Main.Instance.programState = ProgramState.Input;
     
     }
-
+    void ResetBoxState()
+    {
+        Background background;
+        for (int y = 0; y < gridLayer.maxY; y++)
+        {
+            for (int x = 0; x < gridLayer.maxX; x++)
+            {
+                background = backgrounds[x,y];
+                if (background.box != null) {
+                    background.box.boxState = EBoxState.Normal;
+                }
+            }
+        }
+    }
     public void SwapPosition(Background background2)
     {
-        Box temp = jelly;
-        jelly = background2.jelly;
-        background2.jelly = temp;
+        Box temp = box;
+        box = background2.box;
+        background2.box = temp;
         
-        Background tempB = jelly.background;
-        jelly.background = background2.jelly.background;
-        background2.jelly.background = tempB;
+        Background tempB = box.background;
+        box.background = background2.box.background;
+        background2.box.background = tempB;
 
     }
-    IEnumerator FlowJellyToBlank()
+    IEnumerator FlowBoxToBlank()
     {
         Background canMoveBackground, blankBackground;
         while (CanFlow(out canMoveBackground, out blankBackground) ) {
-            yield return canMoveBackground.FillBlank(blankBackground);
+            yield return canMoveBackground.FlowBlank(blankBackground);
         }
         FillInBlank();
-        List<Box> list = new List<Box>();
-        Background background;
-        if (CanMatchJellys(out background,out list))
+        List<MatchInfo> mifList = new List<MatchInfo>();
+
+        if (GetAllMatch(ref mifList))
         {
-            do
-            {
-                background.DestroyMatch(list);
-            }
-            while (CanMatchJellys(out background,out list));
-            
-            yield return FlowJellyToBlank();
+            yield return DestroyMatch(mifList);
+            yield return FlowBoxToBlank();
         }
-        
+            
         
     }
     void FillInBlank()
@@ -109,32 +109,41 @@ public class Background : MonoBehaviour
             for (int x = 0; x < gridLayer.maxX; x++)
             {
                 background = backgrounds[x,y];
-                if (background.jelly == null) {
-                    background.jelly = Main.Instance.match3.NewJellyRandom(background);
+                if (background.box == null) {
+                    background.box = Main.Instance.match3.NewJellyRandom(background);
                 }
             }
         }
     }
 
-    bool CanMatchJellys(out Background background, out List<Box> list)
+    bool GetAllMatch(ref List<MatchInfo> mifList)
     {
+        Background background;
+        mifList.Clear();
         for (int y = 0; y < gridLayer.maxY; y++)
         {
             for (int x = 0; x < gridLayer.maxX; x++)
             {
                 background = backgrounds[x,y];
-                if (background.jelly != null) {
-                    if (background.jelly.checkMatch(out list))
-                        return true;
+                if (background.box != null &&
+                    !ContainIn(background.box, mifList)) {
+                    background.box.checkJellyMatch(ref mifList);
                 }
             }
         }
-        background = null;
-        list = null;
-        return false;
-
+        Debug.Log("Get All Match ->"+mifList.Count);
+        return mifList.Count > 0;
     }
-Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
+    bool ContainIn(Box box, List<MatchInfo> mifList)
+    {
+        foreach(MatchInfo mif in mifList)
+        {
+            if (mif.boxList.Contains(box))
+                return true;
+        }
+        return false;
+    }
+static Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
     bool CanFlow(out Background canMoveBackground,out Background blankBackground)
     {
         for (int y = 0; y < gridLayer.maxY; y++)
@@ -142,7 +151,7 @@ Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2I
             for (int x = 0; x < gridLayer.maxX; x++)
             {
                 blankBackground = backgrounds[x,y];
-                if (blankBackground.jelly == null)
+                if (blankBackground.box == null)
                 {
                     Vector2Int pos = blankBackground.pos;
                     foreach(Vector2Int dir in dirs)
@@ -151,7 +160,7 @@ Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2I
                         if (ValidPos(pos1)) // ต้องอยู่ในกริด
                         {
                             canMoveBackground = backgrounds[pos1.x,pos1.y];
-                            if (canMoveBackground.jelly)  // ต้องไม่ใช่อันว่าง
+                            if (canMoveBackground.box)  // ต้องไม่ใช่อันว่าง
                             {
                                 Vector2Int destPos = pos1+ canMoveBackground.flow; // บวกกับทิศทาง flow
                                 if (ValidPos(destPos) &&  destPos == pos) // ถ้าเท่ากันแสดงว่า ไหลจากตำแหน่ง pos1 มาที่ destPos
@@ -171,29 +180,35 @@ Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2I
         return false;
     }
     
-    IEnumerator FillBlank( Background blankBackground)
+    IEnumerator FlowBlank( Background blankBackground)
     {
-        jelly.transform.DOMove(blankBackground.transform.position, speed);
-        blankBackground.jelly =  jelly;
-        jelly = null;
-        blankBackground.jelly.background = blankBackground;
-        yield return new WaitForSeconds(speed);
+        box.transform.DOMove(blankBackground.transform.position, Main.Instance.flowSpeed);
+        blankBackground.box =  box;
+        box = null;
+        blankBackground.box.background = blankBackground;
+        yield return new WaitForSeconds(Main.Instance.flowSpeed);
         
         
     }
 
-    public void DestroyMatch(List<Box> list)
+    public IEnumerator DestroyMatch(List<MatchInfo> mifList)
     {
-        List<Background> bList = new List<Background>();
-        jelly.AnimationMatch(list);
-        foreach(Box jelly in list)
+        List<Box> boxList = new List<Box>();
+        foreach(MatchInfo mif in mifList)
         {
-            bList.Add(this);
-            jelly.DestoryJelly();
-            
+            boxList = boxList.Union(mif.boxList).Distinct().ToList();
         }
-        
-        
+        box.AnimationMatch(boxList);
+        yield return new WaitForSeconds(0.6f);
+        foreach(Box box in boxList)
+        {
+            if (box.boxState == EBoxState.Die)
+            {
+                box.DestroyBox();
+//                Debug.Log("DESTROY : "+ box.subType);
+            }
+                
+        }
         
     }
     private bool ValidPos(Vector2Int pos)

@@ -62,7 +62,7 @@ public class Match3:MonoBehaviour
         foreach(BoxInfo bif in file.boxData.layer1)
         {
             Background background = gridLayer.backgrounds[bif.x,bif.y];
-            gridLayer.backgrounds[bif.x, bif.y].jelly = createJelly(background, bif.subType);
+            gridLayer.backgrounds[bif.x, bif.y].box = createJelly(background, bif.subType);
             
         }
 
@@ -72,10 +72,10 @@ public class Match3:MonoBehaviour
             for (int x = 0; x < columns; x++)
             {
                 Background background = gridLayer.backgrounds[x,y];
-                if (!background.jelly)
+                if (!background.box)
                 {
                     BoxSubType subType = GetSubTypeNotMatch3(file.boxData.rows, file.boxData.columns,y, x, gridLayer.backgrounds);
-                    gridLayer.backgrounds[x, y].jelly =  createJelly(background, subType);
+                    gridLayer.backgrounds[x, y].box =  createJelly(background, subType);
 
                 }
 
@@ -89,7 +89,7 @@ public class Match3:MonoBehaviour
         
         for (;;)
         {
-            BoxSubType subType = (BoxSubType) Random.Range((int) BoxSubType.JellyRed, (int) BoxSubType.JellyOrange+1);
+            BoxSubType subType = (BoxSubType) Random.Range((int) BoxSubType.JellyRed, (int) BoxSubType.JellyCyan+1);
             
             if (countSubType(Vector2Int.right, rows, cols, row, col, background,subType) +
                 countSubType(Vector2Int.left, rows, cols, row, col, background,subType) < 2)
@@ -116,8 +116,8 @@ public class Match3:MonoBehaviour
         {
             if (pos.x < 0 || pos.y < 0) return count;
             if (pos.x >= cols || pos.y >= rows) return count;
-            if (background[pos.x,pos.y].jelly == null) return count;
-            if (background[pos.x,pos.y].jelly.subType == subType) count++;
+            if (background[pos.x,pos.y].box == null) return count;
+            if (background[pos.x,pos.y].box.subType == subType) count++;
             else
                 return count;
         }
@@ -135,7 +135,7 @@ public class Match3:MonoBehaviour
                 SpriteRenderer sr3 = jelly.GetComponent<SpriteRenderer>();
                 sr3.sprite = file.GetSprite(subType);
                 sr3.sortingOrder = 2;
-                jelly.name = "Jelly " + background.pos.x +","+ background.pos.y;
+                jelly.name = "Box " + background.pos.x +","+ background.pos.y;
                 jelly.subType = subType;
 
                 jelly.transform.localScale = background.transform.localScale;
@@ -149,7 +149,7 @@ public class Match3:MonoBehaviour
     public Box NewJellyRandom(Background background)
     {
 
-          BoxSubType subType = (BoxSubType) Random.Range((int) BoxSubType.JellyRed, (int) BoxSubType.JellyOrange+1);
+          BoxSubType subType = (BoxSubType) Random.Range((int) BoxSubType.JellyRed, (int) BoxSubType.JellyCyan+1);
 
           return createJelly(background, subType);
     }

@@ -12,7 +12,7 @@ public class Global : MonoBehaviour
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        if (!file.OnLoadData()) {
+        if (!file.onLoadBoxData()) {
             Debug.Log("Can't Load Data File");
             return;
         }

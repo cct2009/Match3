@@ -7,6 +7,8 @@ using System.IO;
 public struct SubTypeSprite
 {
     public BoxSubType subType;
+    public Sprite[] pic;
+    public bool move;
     public Sprite sr;
 }
 public class FileData : MonoBehaviour
@@ -20,7 +22,7 @@ public class FileData : MonoBehaviour
         saveFilePath = Application.persistentDataPath + "/BoxData.json";    
         directionFilePath1 = Application.persistentDataPath + "/direction";
     }
-    public  bool  OnLoadData()
+    public  bool  onLoadBoxData()
     {
         
          if (File.Exists(saveFilePath))

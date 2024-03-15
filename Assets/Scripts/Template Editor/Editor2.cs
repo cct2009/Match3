@@ -55,7 +55,7 @@ public class Editor2 : MonoBehaviour
                 {
                     background = hit.transform.GetComponent<Background>();
                     Debug.Log("Hit "+background.pos+": Data "+gridLayer.backgrounds[background.pos.x, background.pos.y] );
-                    background.jelly = createJelly(background, (BoxSubType) int.Parse(subTypeIn.text));
+                    background.box = createJelly(background, (BoxSubType) int.Parse(subTypeIn.text));
 
                 }
 
@@ -92,10 +92,10 @@ public class Editor2 : MonoBehaviour
     private Box createJelly(Background background, BoxSubType subType)
     {
         Box jelly;
-            if (background.jelly == null)
+            if (background.box == null)
                  jelly = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, background.transform);
             else    
-                jelly = background.jelly;
+                jelly = background.box;
                 
             SpriteRenderer sr3 = jelly.GetComponent<SpriteRenderer>();
             sr3.sprite = file.GetSprite(subType);
@@ -117,7 +117,7 @@ public class Editor2 : MonoBehaviour
             {
                 Background background = gridLayer.backgrounds[x,y];
 
-                    background.jelly = createJelly(background, BoxSubType.ArrowDown);
+                    background.box = createJelly(background, BoxSubType.ArrowDown);
             }
         }
     }
@@ -134,9 +134,9 @@ public class Editor2 : MonoBehaviour
                 {
                     BoxInfo bf = new BoxInfo();
                     Background background = backgrounds[x,y];
-                    if (background.jelly)
+                    if (background.box)
                     {
-                        Box jelly = background.jelly;
+                        Box jelly = background.box;
                         bf.subType = jelly.subType;
                         bf.x = x;
                         bf.y = y;
@@ -168,7 +168,7 @@ public class Editor2 : MonoBehaviour
         {
             Background background = gridLayer.backgrounds[bif.x,bif.y];
 
-            background.jelly = createJelly(background, bif.subType);          
+            background.box = createJelly(background, bif.subType);          
 
         }
     }

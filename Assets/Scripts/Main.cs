@@ -30,6 +30,8 @@ public class Main : MonoBehaviour
     public ProgramState programState;
     private GridLayer gridLayer;
     public int DirectionVersion=1;
+    public float flowSpeed = 0.06f;
+    public float dieSpeed = 0.5f;
     
     private void Awake() {
         if (Instance == null)
@@ -113,6 +115,7 @@ public class Main : MonoBehaviour
                 }
                 programState = ProgramState.Animation;
             //    Debug.Log(background.jelly);
+                if (background)
                 StartCoroutine(background.SwitchItem(swipeDirection));
                     
 
