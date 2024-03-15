@@ -123,7 +123,7 @@ public class Box : MonoBehaviour
         boxList.Add(GetBoxAt(sum));
         return true;
     }
-    Box GetBoxAt(Vector2Int dir)
+    public Box GetBoxAt(Vector2Int dir)
     {
         Vector2Int pos = background.pos + dir;
         return backgrounds[pos.x,pos.y].box;
@@ -177,7 +177,10 @@ public class Box : MonoBehaviour
 //        yield return new WaitForSeconds(0.6f);
 
     }
-
+    public bool isEffect(BoxSubType subType)
+    {
+        return (subType == BoxSubType.ObstructWood);
+    }
     public bool isJelly()
     {
         return (subType >= BoxSubType.JellyRed && subType <= BoxSubType.JellyCyan);

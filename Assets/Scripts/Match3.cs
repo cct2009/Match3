@@ -130,18 +130,21 @@ public class Match3:MonoBehaviour
         GameObject panel = GameObject.Find("Panel");
             if (background)
             {
-                Box jelly = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, panel.transform);
+                Box box = Instantiate(PrefabJelly, background.transform.position, Quaternion.identity, panel.transform);
                 
-                SpriteRenderer sr3 = jelly.GetComponent<SpriteRenderer>();
+                SpriteRenderer sr3 = box.GetComponent<SpriteRenderer>();
                 sr3.sprite = file.GetSprite(subType);
                 sr3.sortingOrder = 2;
-                jelly.name = "Box " + background.pos.x +","+ background.pos.y;
-                jelly.subType = subType;
+                box.name = "Box " + background.pos.x +","+ background.pos.y;
+                box.subType = subType;
+                box.live = 1;
+                box.move = file.GetMove(subType);
+                box.boxState = EBoxState.Normal;
 
-                jelly.transform.localScale = background.transform.localScale;
-                jelly.background = background;
+                box.transform.localScale = background.transform.localScale;
+                box.background = background;
                 
-                return jelly;
+                return box;
             }
             return null;
     }

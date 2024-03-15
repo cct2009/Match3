@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
-using System.Runtime.Serialization.Formatters;
-using System.Security.Cryptography;
-using Unity.VisualScripting;
+
 
 
 public class Background : MonoBehaviour
@@ -26,31 +24,36 @@ public class Background : MonoBehaviour
     public IEnumerator SwitchItem(Vector2Int swipeDirection)
     {
         Vector2Int item2Pos = pos+swipeDirection;
-        if (ValidPos(item2Pos))
+        if (ValidPos(item2Pos)) 
         {
             Background background2 = backgrounds[item2Pos.x, item2Pos.y];
             
-            box.transform.DOMove(background2.transform.position,0.3f).SetEase(Ease.OutCubic);
-            background2.box.transform.DOMove(transform.position, 0.3f).SetEase( Ease.OutCubic);
-            SwapPosition(background2);    
-            yield return new WaitForSeconds(0.3f);
-
-            List<MatchInfo> mifList = new List<MatchInfo>();
-            box.checkJellyMatch(ref mifList);
-            background2.box.checkJellyMatch(ref mifList);
-
-            if (mifList.Count == 0)
+            if (box.move && background2.box.move) 
             {
-                SwapPosition(background2);  
-                box.transform.DOMove(transform.position,0.3f).SetEase(Ease.OutCubic);
-                background2.box.transform.DOMove(background2.transform.position, 0.3f).SetEase( Ease.OutCubic);
+                box.transform.DOMove(background2.transform.position,0.3f).SetEase(Ease.OutCubic);
+                background2.box.transform.DOMove(transform.position, 0.3f).SetEase( Ease.OutCubic);
+                SwapPosition(background2);    
                 yield return new WaitForSeconds(0.3f);
-            }
-            else
-            {
-                yield return DestroyMatch(mifList); 
-                    
-                yield return FlowBoxToBlank();
+
+                List<MatchInfo> mifList = new List<MatchInfo>();
+                box.checkJellyMatch(ref mifList);
+                background2.box.checkJellyMatch(ref mifList);
+
+                if (mifList.Count == 0)
+                {
+                    // SwapPosition(background2);  
+                    // box.transform.DOMove(transform.position,0.3f).SetEase(Ease.OutCubic);
+                    // background2.box.transform.DOMove(background2.transform.position, 0.3f).SetEase( Ease.OutCubic);
+                    // yield return new WaitForSeconds(0.3f);
+                }
+                else
+                {
+                    yield return DestroyMatch(mifList); 
+                        
+                    yield return FlowBoxToBlank();
+                    Main.Instance.AddTimes(-1);
+
+                }
 
             }
             
@@ -131,7 +134,7 @@ public class Background : MonoBehaviour
                 }
             }
         }
-        Debug.Log("Get All Match ->"+mifList.Count);
+        
         return mifList.Count > 0;
     }
     bool ContainIn(Box box, List<MatchInfo> mifList)
@@ -160,7 +163,7 @@ static Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, V
                         if (ValidPos(pos1)) // ต้องอยู่ในกริด
                         {
                             canMoveBackground = backgrounds[pos1.x,pos1.y];
-                            if (canMoveBackground.box)  // ต้องไม่ใช่อันว่าง
+                            if (canMoveBackground.box && canMoveBackground.box.move)  // ต้องไม่ใช่อันว่าง
                             {
                                 Vector2Int destPos = pos1+ canMoveBackground.flow; // บวกกับทิศทาง flow
                                 if (ValidPos(destPos) &&  destPos == pos) // ถ้าเท่ากันแสดงว่า ไหลจากตำแหน่ง pos1 มาที่ destPos
@@ -191,13 +194,55 @@ static Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, V
         
     }
 
+    void ExpandRange(ref List<Box> boxList)
+    {
+        List<Box> expandList = new List<Box>();
+        foreach(Box box in boxList)
+        {
+            Box expBox;
+            foreach(Vector2Int dir in dirs)
+            {
+                expBox = passCondition(box, dir);
+                if (expBox != null) {
+                    expBox.boxState = EBoxState.Minus;
+                    expandList.Add(expBox);
+                   
+                } 
+            }
+        }
+        boxList = boxList.Union(expandList).Distinct().ToList();
+    }
+    Box passCondition(Box box, Vector2Int dir)
+    {
+        Vector2Int pos = box.background.pos + dir;
+        if (!ValidPos(pos)) return null;
+        Box expBox = backgrounds[pos.x,pos.y].box;
+        if (expBox.isEffect(expBox.subType)) 
+            return expBox;
+        return null;
+        
+    }
     public IEnumerator DestroyMatch(List<MatchInfo> mifList)
     {
         List<Box> boxList = new List<Box>();
+        // รวม matchInfo ทั้งหมดเข้าด้วยกัน เป็นรายการของ box ทั้งหมดที่จะโดนทำลายหรือไม่โดนเลย (เป็น live)
         foreach(MatchInfo mif in mifList)
         {
             boxList = boxList.Union(mif.boxList).Distinct().ToList();
         }
+        ExpandRange(ref boxList);
+
+        foreach(Box box in boxList)
+        {
+            if (box.boxState == EBoxState.Minus)
+            {
+                box.live--;
+                if (box.live == 0)
+                    box.boxState = EBoxState.Die;
+            }
+                
+        }
+
         box.AnimationMatch(boxList);
         yield return new WaitForSeconds(0.6f);
         foreach(Box box in boxList)

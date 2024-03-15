@@ -50,8 +50,17 @@ public class FileData : MonoBehaviour
         foreach(SubTypeSprite ss in subTypeSprite)
         {
             if (ss.subType == subType)
-                return ss.sr;
+                return ss.pic[0];
         }
         return null;
+    }
+    public bool GetMove(BoxSubType subType)
+    {
+        foreach(SubTypeSprite ss in subTypeSprite)
+        {
+            if (ss.subType == subType)
+                return ss.move;
+        }
+        return true;
     }
 }

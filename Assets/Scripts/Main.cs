@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
-using Unity.VisualScripting;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
@@ -32,7 +31,9 @@ public class Main : MonoBehaviour
     public int DirectionVersion=1;
     public float flowSpeed = 0.06f;
     public float dieSpeed = 0.5f;
-    
+    public TMP_Text times;
+    public TMP_Text goalTimes;
+
     private void Awake() {
         if (Instance == null)
             Instance = this;
@@ -124,7 +125,22 @@ public class Main : MonoBehaviour
 
         }
     }
-   
+    public void AddTimes(int added)
+    {
+        int tm = int.Parse(times.text);
+        tm += added;
+        if (tm < 0) tm = 0;
+        times.text = tm.ToString();
+    }
+
+    public void AddGoalTimes(int added)
+    {
+        int tm = int.Parse(goalTimes.text);
+        tm += added;
+        if (tm < 0) tm = 0;
+        goalTimes.text = tm.ToString();
+
+    }
     private void OnEnable()
     {
         EnhancedTouchSupport.Enable();
