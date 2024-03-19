@@ -6,7 +6,7 @@ using System.IO;
 [System.Serializable]
 public struct SubTypeSprite
 {
-    public BoxSubType subType;
+    public BoxType subType;
     public Sprite[] pic;
     public bool move;
     public Sprite sr;
@@ -19,7 +19,7 @@ public class FileData : MonoBehaviour
     private string directionFilePath1;
 
     private void Awake() {
-        saveFilePath = Application.persistentDataPath + "/BoxData.json";    
+        saveFilePath = Application.persistentDataPath + "/level1.json";    
         directionFilePath1 = Application.persistentDataPath + "/direction";
     }
     public  bool  onLoadBoxData()
@@ -45,22 +45,42 @@ public class FileData : MonoBehaviour
         }
         return false;
     }
-    public Sprite GetSprite(BoxSubType subType)
+    public Sprite GetSprite(BoxType type)
     {
         foreach(SubTypeSprite ss in subTypeSprite)
         {
-            if (ss.subType == subType)
-                return ss.pic[0];
+            if (ss.subType == type)
+                return (ss.pic.Length < 1? null : ss.pic[0]);
         }
         return null;
     }
-    public bool GetMove(BoxSubType subType)
+    public Sprite GetSpriteForLive(Box box)
     {
         foreach(SubTypeSprite ss in subTypeSprite)
         {
-            if (ss.subType == subType)
+            if (ss.subType == box.type)
+            {
+                return ss.pic[ss.pic.Length - box.live];
+            }
+        }
+        return null;
+    }
+    public bool GetMove(BoxType type)
+    {
+        foreach(SubTypeSprite ss in subTypeSprite)
+        {
+            if (ss.subType == type)
                 return ss.move;
         }
         return true;
+    }
+    public int GetLive(BoxType type)
+    {
+        foreach(SubTypeSprite ss in subTypeSprite)
+        {
+            if (ss.subType == type)
+                return ss.pic.Length;
+        }
+        return 1;
     }
 }

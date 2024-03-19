@@ -5,8 +5,10 @@ using UnityEngine;
 public class Global : MonoBehaviour
 {
      public static Global Instance;
-     public GridLayer gridLayer;
-    public FileData file;
+     public static GridLayer gridLayer;
+     public static Background[,] backgrounds;
+    public  FileData file;
+    static public Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
     private void Awake() {
         if (Instance == null)
             Instance = this;
@@ -18,19 +20,17 @@ public class Global : MonoBehaviour
         }
         gridLayer = new GridLayer();
         gridLayer.backgrounds = new Background[file.boxData.rows, file.boxData.columns];
+        backgrounds = gridLayer.backgrounds;
+
         gridLayer.maxX = file.boxData.columns;
         gridLayer.maxY = file.boxData.rows;
 
     }
-    // Start is called before the first frame update
-    void Start()
+    public static bool ValidPos(Vector2Int pos)
     {
-        
+        if (pos.x < 0 || pos.y < 0) return false;
+        if (pos.x >= gridLayer.maxX || pos.y >= gridLayer.maxY) return false;
+        return true;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

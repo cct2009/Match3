@@ -2,10 +2,65 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+using System;
 using System.Linq;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
+
+
+
+[Serializable]
+public enum BoxType
+{
+    Vacant = 0,
+    Close = 1,
+
+    JellyRandom = 10,
+    JellyRed = 11,
+    JellyGreen = 12,
+    JellyBlue = 13,
+    JellyOrange = 14,
+    JellyPink =15,
+    JellyCyan = 16,
+
+
+
+    PowerUpVer = 21,
+    PowerUpHor = 22,
+    PowerUpPoint = 23,
+    PowerUpBomp = 24,
+    PowerUpGlobe = 25,
+
+    ObstructWood = 31,
+    ObstructPenguine = 32,
+    ObstructStone = 33,
+    ObstructBread = 34,
+
+    ArmerIce = 41,
+    ArmerChain = 42,
+
+    CookieTray = 51,
+    ArrowDown = 100,
+    ArrowLeft = 101,
+    ArrowRight = 102,
+    ArrowUp = 103
+
+}
+[Serializable]
+public class BoxInfo 
+{
+    public int x, y;
+    public BoxType type;
+
+}
+[Serializable]
+public class BoxData
+{
+    public int rows;
+    public int columns;
+    public List<BoxInfo> layer1;
+    public List<BoxInfo> layer2;
+    public List<BoxInfo> layer3;
+}
 
 public enum EBoxState {
     Normal = 0,
@@ -18,6 +73,8 @@ public enum EMatchType {
     VER=1,
     SQUARE = 2,
     BOMB = 3,
+    ROW = 4,
+    COL = 5,
 }
 public struct MatchInfo {
     public EMatchType type;
@@ -26,7 +83,7 @@ public struct MatchInfo {
 }
 public class Box : MonoBehaviour
 {
-    public BoxSubType subType;
+    public BoxType type;
     static GridLayer gridLayer;
     static Background[,] backgrounds;
     public Background background;
@@ -36,23 +93,25 @@ public class Box : MonoBehaviour
     public EBoxState boxState;
     
     private void Start() {
-            gridLayer = Global.Instance.gridLayer;
+            gridLayer = Global.gridLayer;
             backgrounds = gridLayer.backgrounds;    
     }
     
     private void TranzformMatch(ref MatchInfo mif)
     {   // เปลี่ยน jelly เป็น powerup กรณี match 4, 5 
         // ตั้งค่า boxState เป็น Die หรือ Live
-        mif.boxList.Add(this);
+//        mif.boxList.Add(this);
         switch(mif.boxList.Count)
         {
             case 4: if (mif.type ==  EMatchType.SQUARE)
-                        ReplaceJelly(BoxSubType.PowerUpPoint);
-                    else
+                        ReplaceJelly(BoxType.PowerUpPoint);
+                    else if (mif.type == EMatchType.VER || mif.type == EMatchType.HOR)
                         ReplaceJelly(RandomPower4());
             boxState =  EBoxState.Live;
             break;
-            case 5: ReplaceJelly(BoxSubType.PowerUpGlobe);
+            case 5: 
+            if (mif.type == EMatchType.VER || mif.type == EMatchType.HOR)
+                ReplaceJelly(BoxType.PowerUpGlobe);
             boxState =  EBoxState.Live;
             break;
         }
@@ -64,8 +123,61 @@ public class Box : MonoBehaviour
         
 
     }
-    
-    public void checkJellyMatch(ref List<MatchInfo> mifList)
+    public void checkPower4Match(ref List<MatchInfo> mifList)
+    {
+        if (!IsPower4()) return;
+        if (type == BoxType.PowerUpVer)
+            matchEntireCol(ref mifList);
+        else
+            matchEntireRow(ref mifList);
+    }
+
+    private void matchEntireCol(ref List<MatchInfo> mifList)
+    {
+        List<Box> boxList = new List<Box>();
+        for (int row = 0; row < gridLayer.maxY; row++)
+        {
+            Box box1 = backgrounds[background.pos.x, row].box;
+            if (box1)
+            {
+                if (box1.isJelly() || box1.type == BoxType.PowerUpVer)
+                    box1.boxState = EBoxState.Die;
+                else if (box1.isEffect(box1.type))
+                    box1.boxState = EBoxState.Minus;
+                boxList.Add(box1);
+            }
+        }
+        MatchInfo mif = new MatchInfo();
+        mif.type = EMatchType.COL;
+        mif.boxList = boxList;
+        mifList.Add(mif);
+
+
+    }
+
+    private void matchEntireRow(ref List<MatchInfo> mifList)
+    {
+        List<Box> boxList = new List<Box>();
+        for (int col = 0; col < gridLayer.maxX; col++)
+        {
+            Box box1 = backgrounds[col, background.pos.y].box;
+            if (box1)
+            {
+                if (box1.isJelly()|| box1.type == BoxType.PowerUpHor)
+                    box1.boxState = EBoxState.Die;
+                else if (box1.isEffect(box1.type))
+                    box1.boxState = EBoxState.Minus;
+                boxList.Add(box1);
+            }
+        }
+        MatchInfo mif = new MatchInfo();
+        mif.type = EMatchType.COL;
+        mif.boxList = boxList;
+        mifList.Add(mif);
+
+        
+    }
+    public void checkJellyMatch(ref List<MatchInfo> mifList,bool tranzform=true)
     {
         if (!isJelly()) return;
 
@@ -91,9 +203,11 @@ public class Box : MonoBehaviour
                 MatchInfo mif = new MatchInfo();
                 mif.type = i==0? EMatchType.HOR: i==1? EMatchType.VER : EMatchType.SQUARE;
                 mif.boxList = boxList;
-                TranzformMatch(ref mif);
+                mif.boxList.Add(this);
+                if (tranzform)
+                    TranzformMatch(ref mif);
                 mifList.Add(mif);
-                PrintLayerList(mif);
+                PrintMatchInfo(mif);
             }
 
         }
@@ -114,9 +228,9 @@ public class Box : MonoBehaviour
     {
         Vector2Int sum = dir1+dir2;
 
-        if (!checkSubType(dir1)) return false;
-        if (!checkSubType(dir2)) return false;
-        if (!checkSubType(sum)) return false;
+        if (!checkType(dir1)) return false;
+        if (!checkType(dir2)) return false;
+        if (!checkType(sum)) return false;
 
         boxList.Add(GetBoxAt(dir1));
         boxList.Add(GetBoxAt(dir2));
@@ -128,11 +242,11 @@ public class Box : MonoBehaviour
         Vector2Int pos = background.pos + dir;
         return backgrounds[pos.x,pos.y].box;
     }
-    bool checkSubType(Vector2Int dir)
+    bool checkType(Vector2Int dir)
     {
         Vector2Int pos = background.pos + dir;
-        if (!ValidPos(pos)) return false;
-        return backgrounds[pos.x,pos.y].box.subType == subType;
+        if (!Global.ValidPos(pos)) return false;
+        return backgrounds[pos.x,pos.y].box.type == type;
         
     }
     private List<Box> matchAlong(Vector2Int direction1, Vector2Int direction2)
@@ -144,11 +258,11 @@ public class Box : MonoBehaviour
     {
         List<Box> matchList = new List<Box>();
         Vector2Int checkPos = background.pos+direction;
-        while (ValidPos(checkPos))
+        while (Global.ValidPos(checkPos))
         {
             Box  checkItem = backgrounds[checkPos.x,checkPos.y].box;
             if (checkItem == null) break;
-            if (subType != checkItem.subType) break;
+            if (type != checkItem.type) break;
             matchList.Add(checkItem);
             checkPos = checkPos+direction;
         }
@@ -177,33 +291,33 @@ public class Box : MonoBehaviour
 //        yield return new WaitForSeconds(0.6f);
 
     }
-    public bool isEffect(BoxSubType subType)
+    public bool isEffect(BoxType type)
     {
-        return (subType == BoxSubType.ObstructWood);
+        return (type == BoxType.ObstructWood ||
+                type == BoxType.CookieTray  ||
+                type == BoxType.ObstructStone);
     }
     public bool isJelly()
     {
-        return (subType >= BoxSubType.JellyRed && subType <= BoxSubType.JellyCyan);
+        return (type >= BoxType.JellyRed && type <= BoxType.JellyCyan);
     }
-    private void ReplaceJelly(BoxSubType subType)
+    private void ReplaceJelly(BoxType type)
     {
-        this.subType = subType;
+        this.type = type;
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        sr.sprite = Global.Instance.file.GetSprite(subType);
+        sr.sprite = Global.Instance.file.GetSprite(type);
 
     }
-    private BoxSubType RandomPower4()
+    private BoxType RandomPower4()
     {
-        int r = Random.Range(0,2);
-        return (r == 0? BoxSubType.PowerUpVer: BoxSubType.PowerUpHor);
+        int r = UnityEngine.Random.Range(0,2);
+        return (r == 0? BoxType.PowerUpVer: BoxType.PowerUpHor);
     }
 
-    private bool ValidPos(Vector2Int pos)
+    public bool IsPower4()
     {
-        if (pos.x < 0 || pos.y < 0) return false;
-        if (pos.x >= gridLayer.maxX || pos.y >= gridLayer.maxY) return false;
-        return true;
-    }
+        return (type == BoxType.PowerUpVer || type == BoxType.PowerUpHor);
+    }    
 
   
     
@@ -260,13 +374,13 @@ public void DrawBorder(List<Box> list,LineRenderer lr)
 //            lr.SetPosition(i,ly.transform.position);
 
     }
-   void PrintLayerList(MatchInfo mif)
+   public void PrintMatchInfo(MatchInfo mif)
    {
         string s = mif.type + " "+ mif.boxList.Count+"-";
         int i =0;
         foreach(Box box in mif.boxList)
         {
-            s += box.subType + ",";
+            s += box.background.pos + "["+box.type + "],";
             i++;
         }
             

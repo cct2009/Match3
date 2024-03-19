@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
+using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public enum ProgramState 
@@ -12,6 +14,13 @@ public enum ProgramState
     InitData = 2,
 
 }
+[System.Serializable]
+public struct GoalData
+{
+    public BoxType boxType;
+    public int times;
+}
+
 public struct GridLayer
 {
     public int maxX, maxY;
@@ -28,18 +37,25 @@ public class Main : MonoBehaviour
     public LineRenderer lr1, lr2;
     public ProgramState programState;
     private GridLayer gridLayer;
+    private Background[,] backgrounds;
     public int DirectionVersion=1;
     public float flowSpeed = 0.06f;
     public float dieSpeed = 0.5f;
     public TMP_Text times;
     public TMP_Text goalTimes;
+    public ParticleSystem  part;
+    
+    public GoalData[] goals;
 
     private void Awake() {
         if (Instance == null)
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        gridLayer = Global.Instance.gridLayer;
+        gridLayer = Global.gridLayer;
+        backgrounds = gridLayer.backgrounds;
+
+        
 
     }
     void Start()
@@ -47,10 +63,11 @@ public class Main : MonoBehaviour
 
         matchPanel.CreateGrid(gridLayer);
 
-        match3.Init(global.file);
-        match3.LoadJelly();
+        match3.Init(Global.Instance.file);
+        match3.LoadBox();
         match3.LoadDirection(DirectionVersion);
-        
+        DrawBorder();
+
         programState = ProgramState.InitData;
         
     }
@@ -81,7 +98,7 @@ public class Main : MonoBehaviour
         if (Touch.activeTouches.Count > 0)
         {
             Touch touch = Touch.activeTouches[0];
-
+            
             if (touch.began)
             {
                 pos1 = touch.screenPosition;
@@ -118,11 +135,14 @@ public class Main : MonoBehaviour
             //    Debug.Log(background.jelly);
                 if (background)
                 StartCoroutine(background.SwitchItem(swipeDirection));
-                    
-
-
             }
 
+        }
+        else
+        {
+            //show box can swipe to match
+            // background = backgrounds[0,0];
+            // StartCoroutine(background.ShowCanMatch());
         }
     }
     public void AddTimes(int added)
@@ -141,6 +161,119 @@ public class Main : MonoBehaviour
         goalTimes.text = tm.ToString();
 
     }
+    private void DrawBorder()
+    {
+        Background background;
+        lr1.sortingOrder  = 4;
+        lr1.startWidth = 0.02f;
+        lr1.endWidth = 0.02f;
+        lr1.positionCount = 0;
+        Vector2Int start = new Vector2Int(0,0);
+        
+        background = backgrounds[start.x,start.y];
+        Vector2Int nextPos = start;
+        while (Global.ValidPos(nextPos))
+        {
+            DrawBorderBottom(nextPos);
+            nextPos = nextPos + Vector2Int.right;
+        }
+        nextPos = nextPos - Vector2Int.right;
+        while (Global.ValidPos(nextPos))
+        {
+            DrawBorderRight(nextPos);
+            nextPos = nextPos + Vector2Int.up;
+        }
+        nextPos = nextPos - Vector2Int.up ;
+        while (Global.ValidPos(nextPos))
+        {
+            DrawBorderTop(nextPos);
+            nextPos = nextPos + Vector2Int.left;
+        }
+        nextPos = nextPos - Vector2Int.left ;
+        while (Global.ValidPos(nextPos))
+        {
+            DrawBorderLeft(nextPos);
+            nextPos = nextPos + Vector2Int.down;
+        }
+        
+    }
+
+    private  void DrawBorderLeft(Vector2Int pos)
+    {
+        Background background = backgrounds[pos.x,pos.y];
+
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+        
+        if (!Global.ValidPos(pos+Vector2Int.left)) {
+            if (lr1.positionCount == 0)
+            {
+                lr1.positionCount = 1;
+                lr1.SetPosition(0, new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0));
+            }
+            
+            lr1.positionCount++;
+            lr1.SetPosition(lr1.positionCount-1, new Vector3(background.transform.position.x- sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0));
+
+        }
+    }
+    private  void DrawBorderBottom(Vector2Int pos)
+    {
+        Background background = backgrounds[pos.x,pos.y];
+
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+        if (!Global.ValidPos(pos+Vector2Int.down)) {
+            if (lr1.positionCount == 0)
+            {
+                lr1.positionCount = 1;
+                lr1.SetPosition(0, new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0));
+            }
+            
+            lr1.positionCount++;
+            
+            lr1.SetPosition(lr1.positionCount-1, new Vector3(background.transform.position.x+ sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0));
+
+        }
+    }
+    
+    private  void DrawBorderRight(Vector2Int pos)
+    {
+        Background background = backgrounds[pos.x,pos.y];
+
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+        if (!Global.ValidPos(pos+Vector2Int.right)) {
+            if (lr1.positionCount == 0)
+            {
+                lr1.positionCount = 1;
+                lr1.SetPosition(0, new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0));
+            }
+            
+            lr1.positionCount++;
+            
+            lr1.SetPosition(lr1.positionCount-1, new Vector3(background.transform.position.x+ sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0));
+
+        }
+    }
+    private  void DrawBorderTop(Vector2Int pos)
+    {
+        Background background = backgrounds[pos.x,pos.y];
+
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+         if (!Global.ValidPos(pos+Vector2Int.up)) {
+            if (lr1.positionCount == 0)
+            {
+                lr1.positionCount = 1;
+                lr1.SetPosition(0, new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0));
+            }
+            
+            lr1.positionCount++;
+            
+            lr1.SetPosition(lr1.positionCount-1, new Vector3(background.transform.position.x- sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0));
+
+        }
+        
+    }
+
+
     private void OnEnable()
     {
         EnhancedTouchSupport.Enable();

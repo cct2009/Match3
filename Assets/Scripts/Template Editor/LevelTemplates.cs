@@ -43,7 +43,7 @@ public class LevelTemplates : MonoBehaviour
          SpriteRenderer  sr = box.GetComponent<SpriteRenderer>();
          BoxCollider2D rg = box.GetComponent<BoxCollider2D>();
          
-         box.subType = (int) BoxSubType.JellyRandom;
+         box.subType = (int) BoxType.JellyRandom;
         // delete all child with name SR ...
         foreach(SpriteRenderer r in Panel.GetComponentsInChildren<SpriteRenderer>())
             if (r.name.IndexOf("BOX") >= 0)
@@ -90,9 +90,9 @@ public class LevelTemplates : MonoBehaviour
                     BoxInfo bf = new BoxInfo();
                     string name = "BOX1 "+(y.ToString()) + "," + x.ToString();
                     BoxManager box = GameObject.Find(name).GetComponent<BoxManager>();
-                    if (box != null && box.subType != (int) BoxSubType.JellyRandom)
+                    if (box != null && box.subType != (int) BoxType.JellyRandom)
                     {
-                        bf.subType = (BoxSubType) box.subType;
+                        bf.type = (BoxType) box.subType;
                         bf.x = x;
                         bf.y = y;
                         boxData.layer1.Add(bf);
@@ -108,7 +108,7 @@ public class LevelTemplates : MonoBehaviour
                     if (gm != null)
                     {
                         box = gm.GetComponent<BoxManager>();
-                        bf.subType = (BoxSubType) box.subType;
+                        bf.type = (BoxType) box.subType;
                         bf.x = x;
                         bf.y = y;
                         boxData.layer2.Add(bf);
@@ -124,7 +124,7 @@ public class LevelTemplates : MonoBehaviour
                     if (gm != null)
                     {
                         box = gm.GetComponent<BoxManager>();
-                        bf.subType = (BoxSubType) box.subType;
+                        bf.type = (BoxType) box.subType;
                         bf.x = x;
                         bf.y = y;
                         boxData.layer3.Add(bf);
@@ -173,8 +173,8 @@ public class LevelTemplates : MonoBehaviour
                     
                     BoxManager box1 = gm1.GetComponent<BoxManager>();
                     SpriteRenderer sr1 = gm1.GetComponent<SpriteRenderer>();
-                    box1.subType = (int) bif.subType;
-                    sr1.sprite = GetSprite(bif.subType);
+                    box1.subType = (int) bif.type;
+                    sr1.sprite = GetSprite(bif.type);
   
                 }
             }
@@ -189,8 +189,8 @@ public class LevelTemplates : MonoBehaviour
 
                     BoxManager box2 = gm2.GetComponent<BoxManager>();
                     SpriteRenderer sr2 = gm2.GetComponent<SpriteRenderer>();
-                    box2.subType = (int) bif.subType;
-                    sr2.sprite = GetSprite(bif.subType);
+                    box2.subType = (int) bif.type;
+                    sr2.sprite = GetSprite(bif.type);
                     sr2.sortingOrder = 2;
                     gm2.name = name2;
                 }
@@ -198,7 +198,7 @@ public class LevelTemplates : MonoBehaviour
 
     }
 
-    Sprite GetSprite(BoxSubType subType)
+    Sprite GetSprite(BoxType subType)
     {
         foreach(SubTypeSprite ss in subTypeSprite)
         {

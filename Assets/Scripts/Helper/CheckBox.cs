@@ -9,7 +9,7 @@ public class CheckBox : MonoBehaviour
     public Image Checkbox;
     public Image selImage;
  
-    public BoxSubType subType;
+    public BoxType subType;
     public TMP_Text subTypeOut;
     public void Show(Button button)
     {

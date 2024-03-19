@@ -83,6 +83,7 @@ public class MatchPanel : MonoBehaviour
                 background.pos.x = x; background.pos.y = y;
                 gridLayer.backgrounds[x,y] = background;
                 background.transform.localScale = new Vector3(width1,width1,width1);
+                background.type = EBackgroundType.Vacant;
                 
                 SpriteRenderer  sr1 = background.GetComponent<SpriteRenderer>();
                 

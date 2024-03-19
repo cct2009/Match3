@@ -4,79 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Drawing;
+using UnityEditor.Experimental.GraphView;
 
-public enum BoxType 
-{
-    Vacant = 0,
-    Jelly =10,
-    Powerup = 20,
-    Obstruct = 30,
-    armer = 40,
-    CookieTray = 50,
-    Grass = 70,
-
-}
-public enum BoxSubType
-{
-    Vacant = 0,
-    Close = 1,
-
-    JellyRandom = 10,
-    JellyRed = 11,
-    JellyGreen = 12,
-    JellyBlue = 13,
-    JellyOrange = 14,
-    JellyPink =15,
-    JellyCyan = 16,
-
-
-
-    PowerUpVer = 21,
-    PowerUpHor = 22,
-    PowerUpPoint = 23,
-    PowerUpBomp = 24,
-    PowerUpGlobe = 25,
-
-    ObstructWood = 31,
-    ObstructPenguine = 32,
-    ObstructStone = 33,
-    ObstructBread = 34,
-
-    ArmerIce = 41,
-    ArmerChain = 42,
-
-    ArrowDown = 100,
-    ArrowLeft = 101,
-    ArrowRight = 102,
-    ArrowUp = 103
-
-}
-[Serializable]
-public class BoxInfo 
-{
-    public int x, y;
-    public BoxSubType subType;
-
-}
-[Serializable]
-public class BoxData
-{
-    public int rows;
-    public int columns;
-    public List<BoxInfo> layer1;
-    public List<BoxInfo> layer2;
-    public List<BoxInfo> layer3;
-}
 
 public class BoxManager : MonoBehaviour
 {
     public Image img;
     public int subType;
+    public bool main;
     public TMP_Text subTypeIn;    
     public int level;
-    private void Start() {
-        
-    }
+
 
 
 private void Update() {
@@ -88,19 +27,20 @@ private void Update() {
         if (hit.transform == transform)
         {
             ShowBoxDetails();
-            BoxSubType curSubType = (BoxSubType) int.Parse(subTypeIn.text);
+            BoxType curSubType = (BoxType) int.Parse(subTypeIn.text);
             if (GetSubTypePos(curSubType) >= 0) return;
-            BoxManager oldBox = GetComponent<BoxManager>();
+            BoxManager box = GetComponent<BoxManager>();
+            SpriteRenderer sr1 = box.GetComponent<SpriteRenderer>();
             switch(curSubType)
             {
                 
-                case BoxSubType.ArmerChain:
-                case BoxSubType.ArmerIce:
+                case BoxType.ArmerChain:
+                case BoxType.ArmerIce:
                     GameObject gm2 = Instantiate(transform.gameObject, transform.position,Quaternion.identity, transform.parent.transform);
                     BoxManager box1 = gm2.GetComponent<BoxManager>();
-                    box1.level = oldBox.level + 1;
+                    box1.level = box.level + 1;
                     box1.subType = (int) curSubType;
-                    gm2.name = "BOX"+box1.level.ToString()+ oldBox.name.Substring(4);
+                    gm2.name = "BOX"+box1.level.ToString()+ box.name.Substring(4);
 
                     SpriteRenderer sr2 = gm2.GetComponent<SpriteRenderer>();
                     sr2.sortingOrder = box1.level;
@@ -109,9 +49,19 @@ private void Update() {
                     
 
                 break;
-
+                case BoxType.CookieTray:
+                    Bounds bound1 = sr1.bounds;
+                    transform.position = new Vector3(transform.position.x+bound1.size.x/2 , transform.position.y -bound1.size.y/2,0);
+                    transform.localScale = new Vector3(transform.localScale.x * 2 , transform.localScale.y * 2, 0);
+                    main = true;
+                    SetOtherBox(Vector2Int.right);
+                    SetOtherBox(Vector2Int.down);
+                    SetOtherBox(Vector2Int.down+Vector2Int.right);
+                if (box.level == 1)
+                    Level1SubType();
+                break;
                 default :
-                if (oldBox.level == 1)
+                if (box.level == 1)
                     Level1SubType();
                   break;
 
@@ -122,8 +72,11 @@ private void Update() {
 
     }
 }
-
-int GetSubTypePos(BoxSubType subType)
+void SetOtherBox(Vector2Int dir)
+{
+    
+}
+int GetSubTypePos(BoxType subType)
 {
     for (int i = 1; i <= 5; i++)
     {
@@ -175,7 +128,7 @@ void ShowBoxDetails()
         else
         {
             sr2.sprite = null;
-            box2.subType = (int) BoxSubType.Vacant;
+            box2.subType = (int) BoxType.Vacant;
             box2.level = 0;
         }
     }
