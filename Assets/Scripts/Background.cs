@@ -316,6 +316,11 @@ public class Background : MonoBehaviour
     {
         SpriteRenderer sr = box.GetComponent<SpriteRenderer>();
         sr.sprite = Global.Instance.file.GetSpriteForLive(box);
+        
+        GameObject prefab = Global.Instance.file.GetDieAnimate(box.type);
+        if (prefab == null) prefab = Main.Instance.animate;
+        GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
+        Destroy(go,1);
     }
 
     public IEnumerator DestroyMatch(List<MatchInfo> mifList)

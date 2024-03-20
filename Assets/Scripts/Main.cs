@@ -39,11 +39,13 @@ public class Main : MonoBehaviour
     private GridLayer gridLayer;
     private Background[,] backgrounds;
     public int DirectionVersion=1;
+    public TMP_InputField level;
     public float flowSpeed = 0.06f;
     public float dieSpeed = 0.5f;
     public TMP_Text times;
     public TMP_Text goalTimes;
     public ParticleSystem  part;
+    public GameObject animate;
     
     public GoalData[] goals;
 
@@ -64,14 +66,26 @@ public class Main : MonoBehaviour
         matchPanel.CreateGrid(gridLayer);
 
         match3.Init(Global.Instance.file);
-        match3.LoadBox();
+        match3.DrawBox();
         match3.LoadDirection(DirectionVersion);
         DrawBorder();
 
         programState = ProgramState.InitData;
         
     }
-
+    public void onLoadLevel()
+    {
+        if (Global.Instance.file.onLoadBoxData(int.Parse(level.text)))
+        {
+            matchPanel.CreateGrid(gridLayer);
+            match3.DrawBox();
+            match3.LoadDirection(DirectionVersion);
+            DrawBorder();
+              programState = ProgramState.InitData;
+        }
+        
+        
+    }
     // Update is called once per frame
     void Update()
     {

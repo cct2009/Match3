@@ -60,7 +60,7 @@ public class Match3:MonoBehaviour
         }
 
     }
-    public void LoadBox()
+    public void DrawBox()
     {
         foreach(BoxInfo bif in file.boxData.layer1)
         {
@@ -184,6 +184,8 @@ public class Match3:MonoBehaviour
                 box.transform.position = background.transform.position;
                 box.transform.localScale = background.transform.localScale;
                 box.background = background;
+
+                box.DieAnimate = file.GetDieAnimate(type);
                 
                 return box;
             }

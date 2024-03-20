@@ -2789,64 +2789,76 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 68eb82e66fe6beb49821f12ab9f709a9, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 68eb82e66fe6beb49821f12ab9f709a9, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 11
     pic:
     - {fileID: 21300000, guid: 70b7ce0bb9ad6ac41afc4f92ad49a7dc, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 70b7ce0bb9ad6ac41afc4f92ad49a7dc, type: 3}
+    DieAnimate: {fileID: 4075084934797690825, guid: 3c472905cc16ec847bd25e4bed3b8e67, type: 3}
   - subType: 12
     pic:
     - {fileID: 21300000, guid: 41cdb3d39f84e3d46bb6e19129b6cbec, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 41cdb3d39f84e3d46bb6e19129b6cbec, type: 3}
+    DieAnimate: {fileID: 6177255796473640170, guid: 956fb99d576e23749801ae6d20cda3a4, type: 3}
   - subType: 13
     pic:
     - {fileID: 21300000, guid: 163f61f8d23e0d748894637d6fdb18ef, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 163f61f8d23e0d748894637d6fdb18ef, type: 3}
+    DieAnimate: {fileID: 4543139141886272720, guid: da9c6a80f530c6e4ba13478e7efcb7f2, type: 3}
   - subType: 14
     pic:
     - {fileID: 21300000, guid: be6278a15c0087b4f8ca42912ec7a405, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: be6278a15c0087b4f8ca42912ec7a405, type: 3}
+    DieAnimate: {fileID: 6109505763254210302, guid: f3d8486a782e2424a84ce9fc8758bbf8, type: 3}
   - subType: 21
     pic:
     - {fileID: 21300000, guid: 7c498de87bc242d44b3202cb5451a4f8, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 7c498de87bc242d44b3202cb5451a4f8, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 22
     pic:
     - {fileID: 21300000, guid: 2ed08b7d71747d440bd621d188af4343, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 2ed08b7d71747d440bd621d188af4343, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 23
     pic:
     - {fileID: 21300000, guid: 24588cbbbd45c894b801acf6b91ef06d, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 24588cbbbd45c894b801acf6b91ef06d, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 24
     pic:
     - {fileID: 21300000, guid: abd349be198486c40ac0307752d66354, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: abd349be198486c40ac0307752d66354, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 25
     pic:
     - {fileID: 21300000, guid: 508e0f61930b3684386c1d31be97b2a4, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 508e0f61930b3684386c1d31be97b2a4, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 31
     pic:
-    - {fileID: 21300000, guid: e5973cdb3e610804494c7e7cc13f8f06, type: 3}
-    - {fileID: 21300000, guid: 8a1ed0737abf267479f1dc956734e668, type: 3}
-    - {fileID: 21300000, guid: 3329d5f0331db404aa6194daa9a76d7d, type: 3}
     - {fileID: 21300000, guid: 78811ade4421ae442932c2c99ed10bd3, type: 3}
+    - {fileID: 21300000, guid: 3329d5f0331db404aa6194daa9a76d7d, type: 3}
+    - {fileID: 21300000, guid: 8a1ed0737abf267479f1dc956734e668, type: 3}
+    - {fileID: 21300000, guid: e5973cdb3e610804494c7e7cc13f8f06, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 78811ade4421ae442932c2c99ed10bd3, type: 3}
+    DieAnimate: {fileID: 557076704370329475, guid: ebaf27c95a6a6224388313bf23a9019c, type: 3}
   - subType: 32
     pic:
     - {fileID: 21300000, guid: fb71e266603d57541b1ddc8f0708e13c, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: fb71e266603d57541b1ddc8f0708e13c, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 33
     pic:
     - {fileID: 21300000, guid: 66b32f18235db664daf275f3e50caed5, type: 3}
@@ -2854,6 +2866,7 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 5fc8f5b17be5f534ca0b0f978fe5a102, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 66b32f18235db664daf275f3e50caed5, type: 3}
+    DieAnimate: {fileID: 2201409955255200790, guid: 617c28ff0023c384291db3d0f52a2cfe, type: 3}
   - subType: 41
     pic:
     - {fileID: 21300000, guid: a9c44f238802dbb40b98a58f6b80445c, type: 3}
@@ -2861,51 +2874,61 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 2f1858c93fd81a54ba81f4b16fa91977, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: a9c44f238802dbb40b98a58f6b80445c, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 42
     pic:
     - {fileID: 21300000, guid: 48fa8abc024cc6f49afca384eb54689c, type: 3}
     - {fileID: 21300000, guid: 61d53e9b1a7e1eb41afa6163e8deb866, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 61d53e9b1a7e1eb41afa6163e8deb866, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 100
     pic:
     - {fileID: 21300000, guid: dd590d0ead14f0e4795b185fb6d2cc29, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: dd590d0ead14f0e4795b185fb6d2cc29, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 101
     pic:
     - {fileID: 21300000, guid: 2990be99e0269f946853d81a07fdd7de, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 2990be99e0269f946853d81a07fdd7de, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 102
     pic:
     - {fileID: 21300000, guid: 92d0e05255a550d4fb5bdd2c61a3a1fc, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 92d0e05255a550d4fb5bdd2c61a3a1fc, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 103
     pic:
     - {fileID: 21300000, guid: 02982d0196f16cc4cae51255ca4d4119, type: 3}
     move: 0
     sr: {fileID: 21300000, guid: 02982d0196f16cc4cae51255ca4d4119, type: 3}
+    DieAnimate: {fileID: 0}
   - subType: 15
     pic:
     - {fileID: 21300000, guid: 0e90fab915663f947b6324c6d2cec83a, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 0e90fab915663f947b6324c6d2cec83a, type: 3}
+    DieAnimate: {fileID: 8487901995537141298, guid: bf7eef04792134b439ade1712dde19ae, type: 3}
   - subType: 16
     pic:
     - {fileID: 21300000, guid: 7f1a815d68bc54342b4f4deec7bbb84a, type: 3}
     move: 1
     sr: {fileID: 21300000, guid: 7f1a815d68bc54342b4f4deec7bbb84a, type: 3}
+    DieAnimate: {fileID: 9165129991251887155, guid: db536582706f14547af102165088f8b9, type: 3}
   - subType: 51
     pic:
     - {fileID: 21300000, guid: bb93e25f9911fb74fb62e0510bb85fa3, type: 3}
-    move: 1
+    - {fileID: 21300000, guid: ffc1d6abc1681254c88f7bb3894ea20e, type: 3}
+    - {fileID: 21300000, guid: 7bfb67adf08def54a9b3cb603924e88d, type: 3}
+    - {fileID: 21300000, guid: 2d63a71aea773b44ca51b348073f43c2, type: 3}
+    - {fileID: 21300000, guid: e765c6c59d29ed34996f9e6cafaf57b6, type: 3}
+    - {fileID: 21300000, guid: 4de563799d37ed94a9a961afcb6e506a, type: 3}
+    move: 0
     sr: {fileID: 21300000, guid: bb93e25f9911fb74fb62e0510bb85fa3, type: 3}
-  - subType: 0
-    pic: []
-    move: 1
-    sr: {fileID: 21300000, guid: bb93e25f9911fb74fb62e0510bb85fa3, type: 3}
+    DieAnimate: {fileID: 988949860172486733, guid: f2fac05936d9a65488e4633e320aec0a, type: 3}
 --- !u!114 &948260806
 MonoBehaviour:
   m_ObjectHideFlags: 0

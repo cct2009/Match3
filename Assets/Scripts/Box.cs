@@ -89,6 +89,7 @@ public class Box : MonoBehaviour
     public Background background;
     public bool move;
     public int live;
+    public GameObject DieAnimate;
 
     public EBoxState boxState;
     
@@ -140,10 +141,10 @@ public class Box : MonoBehaviour
             Box box1 = backgrounds[background.pos.x, row].box;
             if (box1)
             {
-                if (box1.isJelly() || box1.type == BoxType.PowerUpVer)
-                    box1.boxState = EBoxState.Die;
-                else if (box1.isEffect(box1.type))
+                if (box1.isEffect(box1.type))
                     box1.boxState = EBoxState.Minus;
+                else 
+                    box1.boxState = EBoxState.Die;
                 boxList.Add(box1);
             }
         }
@@ -163,10 +164,10 @@ public class Box : MonoBehaviour
             Box box1 = backgrounds[col, background.pos.y].box;
             if (box1)
             {
-                if (box1.isJelly()|| box1.type == BoxType.PowerUpHor)
-                    box1.boxState = EBoxState.Die;
-                else if (box1.isEffect(box1.type))
+                if (box1.isEffect(box1.type))
                     box1.boxState = EBoxState.Minus;
+                else
+                    box1.boxState = EBoxState.Die;
                 boxList.Add(box1);
             }
         }
@@ -286,7 +287,14 @@ public class Box : MonoBehaviour
         foreach(Box box in list)
         {
             if (box.boxState == EBoxState.Die)
+            {
+                GameObject prefab = Global.Instance.file.GetDieAnimate(box.type);
+                if (prefab == null) prefab = Main.Instance.animate;
+                GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
                 box.transform.DOScale(0,Main.Instance.dieSpeed);
+                Destroy(go,1);
+            }
+                
         }
 //        yield return new WaitForSeconds(0.6f);
 
