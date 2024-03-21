@@ -33,6 +33,7 @@ public class FileData : MonoBehaviour
             boxData = JsonUtility.FromJson<BoxData>(loadPlayerData);
             return true;
         }
+        Debug.Log("Can't Load BoxData "+ saveFilePath1);
         return false;
     }
 

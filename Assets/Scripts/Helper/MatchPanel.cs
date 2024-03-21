@@ -58,6 +58,7 @@ public class MatchPanel : MonoBehaviour
 
         Sprite square;
 
+        panel.color = new Color(panel.color.r, panel.color.g,panel.color.b, 0);
         // delete all child of panel
         if (panel.transform.childCount > 0)
         {

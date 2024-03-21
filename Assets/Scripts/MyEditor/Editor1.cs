@@ -89,7 +89,7 @@ Background background;
                 {
                     BoxInfo bf = new BoxInfo();
                     Background background = backgrounds[x,y];
-                    if (background.box && background.type == EBackgroundType.Fill && background.box.type != BoxType.JellyRandom)
+                    if (background.box && background.type != EBackgroundType.Protected && background.box.type != BoxType.JellyRandom)
                     {
                         Box box = background.box;
                         bf.type = box.type;
@@ -115,10 +115,10 @@ Background background;
             string loadPlayerData = File.ReadAllText(saveFilePath);
             boxData = JsonUtility.FromJson<BoxData>(loadPlayerData);
             panel.CreateGrid(Global.gridLayer);
-            CreateTemplate(boxData);
+            DrawBox(boxData);
         }
     }
-    void CreateTemplate(BoxData boxData)
+    void DrawBox(BoxData boxData)
     {
         for (int y = 0 ; y < boxData.rows; y++)
         {

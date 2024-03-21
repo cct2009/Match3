@@ -171,10 +171,9 @@ public class Match3:MonoBehaviour
                         ResetCookieTray(background);
                 }
                     
-                background.type = EBackgroundType.Fill;
-                SpriteRenderer sr3 = box.GetComponent<SpriteRenderer>();
-                sr3.sprite = file.GetSprite(type);
-                sr3.sortingOrder = 2;
+                SpriteRenderer sr = box.GetComponent<SpriteRenderer>();
+                sr.sprite = file.GetSprite(type);
+                sr.sortingOrder = 2;
                 box.name = "Box " + background.pos.x +","+ background.pos.y;
                 box.type = type;
                 box.live = file.GetLive(type);
@@ -186,6 +185,20 @@ public class Match3:MonoBehaviour
                 box.background = background;
 
                 box.DieAnimate = file.GetDieAnimate(type);
+
+                // add for type = Close
+                SpriteRenderer sr2 = background.GetComponent<SpriteRenderer>();
+                if (box.type == BoxType.Close)
+                {
+                    sr2.color = new Color(255,255,255,0);
+                    background.type = EBackgroundType.Close;
+                }
+                else
+                {
+                    sr2.color = new Color(255,255,255,255);
+                    background.type = EBackgroundType.Fill;
+
+                }
                 
                 return box;
             }

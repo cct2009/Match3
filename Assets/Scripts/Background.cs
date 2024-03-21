@@ -12,6 +12,7 @@ public enum EBackgroundType{
     Fill = 0,
     Vacant = 1,
     Protected = 2,
+    Close = 3,
 }
 public class Background : MonoBehaviour
 {

@@ -14,8 +14,7 @@ public class Global : MonoBehaviour
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        if (!file.onLoadBoxData(1)) {
-            Debug.Log("Can't Load Data File");
+        if (!file.onLoadBoxData(3)) {
             return;
         }
         gridLayer = new GridLayer();

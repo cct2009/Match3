@@ -1237,6 +1237,11 @@ MonoBehaviour:
     move: 1
     sr: {fileID: 21300000, guid: 7f1a815d68bc54342b4f4deec7bbb84a, type: 3}
     DieAnimate: {fileID: 9165129991251887155, guid: db536582706f14547af102165088f8b9, type: 3}
+  - subType: 1
+    pic: []
+    move: 0
+    sr: {fileID: 21300000, guid: bb93e25f9911fb74fb62e0510bb85fa3, type: 3}
+    DieAnimate: {fileID: 988949860172486733, guid: f2fac05936d9a65488e4633e320aec0a, type: 3}
   - subType: 51
     pic:
     - {fileID: 21300000, guid: bb93e25f9911fb74fb62e0510bb85fa3, type: 3}
@@ -3006,8 +3011,8 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.9811321, g: 0.064791605, b: 0.064791605, a: 1}
-      key1: {r: 1, g: 0.05345905, b: 0.05345905, a: 1}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}

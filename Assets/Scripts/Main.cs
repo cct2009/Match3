@@ -68,7 +68,7 @@ public class Main : MonoBehaviour
         match3.Init(Global.Instance.file);
         match3.DrawBox();
         match3.LoadDirection(DirectionVersion);
-        DrawBorder();
+        DrawDynamicBorder();
 
         programState = ProgramState.InitData;
         
@@ -80,7 +80,7 @@ public class Main : MonoBehaviour
             matchPanel.CreateGrid(gridLayer);
             match3.DrawBox();
             match3.LoadDirection(DirectionVersion);
-            DrawBorder();
+            DrawDynamicBorder();
               programState = ProgramState.InitData;
         }
         
@@ -173,6 +173,94 @@ public class Main : MonoBehaviour
         tm += added;
         if (tm < 0) tm = 0;
         goalTimes.text = tm.ToString();
+
+    }
+    private void DrawDynamicBorder()
+    {
+        lr1.sortingOrder  = 4;
+        lr1.startWidth = 0.02f;
+        lr1.endWidth = 0.02f;
+        lr1.positionCount = 0;
+
+        if (lr1.transform.childCount > 0)
+        {
+            foreach (Transform gm in lr1.transform.GetComponentsInChildren<Transform>())
+            {
+                if (gm != lr1.transform)
+                    Destroy(gm.gameObject);
+            }
+                
+        }
+
+       for (int y = 0; y < gridLayer.maxY;  y++)
+       {
+            for (int x = 0; x < gridLayer.maxX ; x++)
+            {
+                Background background = backgrounds[x,y];
+
+                if (background.type != EBackgroundType.Close)
+                {
+                    WriteBorder(x,y);
+                }
+            }
+       }
+    }
+    private void WriteBorder(int x, int y)
+    {
+        Vector2Int pos = new Vector2Int(x,y);
+        Background background = backgrounds[x,y];
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+
+        Debug.Log("Write Border "+pos+"["+background.type+"]");
+        if (!ValidBorder(pos, Vector2Int.left)) {
+            Vector3 point1 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
+            Vector3 point2 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
+            DrawLine(pos,point1, point2);
+            
+        }
+
+        if (!ValidBorder(pos, Vector2Int.down)) {
+            Vector3 point1 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
+            Vector3 point2 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
+            DrawLine(pos,point1, point2);
+            
+        }
+
+        if (!ValidBorder(pos, Vector2Int.right)) {
+            Vector3 point1 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
+            Vector3 point2 = new Vector3(background.transform.position.x+ sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
+            DrawLine(pos,point1, point2);
+            
+        }
+
+        if (!ValidBorder(pos, Vector2Int.up)) {
+            Vector3 point1 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
+            Vector3 point2 = new Vector3(background.transform.position.x- sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
+            DrawLine(pos,point1, point2);
+            
+        }
+        
+    }
+
+    private bool ValidBorder(Vector2Int pos, Vector2Int dir)
+    {
+        if (!Global.ValidPos(pos+dir)) return false;
+        Vector2Int pos1 = pos+dir;
+        Background background = backgrounds[pos1.x,pos1.y];
+        return background.type != EBackgroundType.Close;
+    }
+
+    private void DrawLine(Vector2Int pos,Vector3 point1, Vector3 point2)
+    {
+        lr2.sortingOrder  = 4;
+        lr2.startWidth = 0.02f;
+        lr2.endWidth = 0.02f;
+        lr2.positionCount = 2;
+        LineRenderer lr = Instantiate(lr2,lr1.transform);
+        lr.name = "LR " + pos;
+        lr.positionCount = 2;
+        lr.SetPosition(0,point1);
+        lr.SetPosition(1,point2);
 
     }
     private void DrawBorder()
