@@ -48,12 +48,12 @@ public class FileData : MonoBehaviour
         }
         return false;
     }
-    public Sprite GetSprite(BoxType type)
+    public Sprite GetSprite(BoxType type,int start = 0)
     {
         foreach(SubTypeSprite ss in subTypeSprite)
         {
             if (ss.subType == type)
-                return (ss.pic.Length < 1? null : ss.pic[0]);
+                return (ss.pic.Length < 1 || ss.pic.Length < start? null : ss.pic[start]);
         }
         return null;
     }

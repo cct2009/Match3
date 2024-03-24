@@ -65,7 +65,7 @@ public class Match3:MonoBehaviour
         foreach(BoxInfo bif in file.boxData.layer1)
         {
             Background background = gridLayer.backgrounds[bif.x,bif.y];
-            gridLayer.backgrounds[bif.x, bif.y].box = createABox(background, bif.type);
+            gridLayer.backgrounds[bif.x, bif.y].box = createABox(background, bif.type,bif.dir,bif.start);
             
         }
 
@@ -148,16 +148,18 @@ public class Match3:MonoBehaviour
 
     }
 
-    public Box createABox(Background background, BoxType type)
+    public Box createABox(Background background, BoxType type, Vector2Int dir, int start )
     {
          if (type == BoxType.CookieTray)
             background.box = CreateCookieTray(background);
+        else if (type == BoxType.DisplayCard)
+            background.box = CreateDisplayCard(background, dir, start);
         else
             background.box = createBox(background, type);
         return background.box;
 
     }
-    public Box createBox(Background background, BoxType type)
+    public Box createBox(Background background, BoxType type,int start=0)
     {
         GameObject panel = GameObject.Find("Panel");
             if (background)
@@ -172,7 +174,7 @@ public class Match3:MonoBehaviour
                 }
                     
                 SpriteRenderer sr = box.GetComponent<SpriteRenderer>();
-                sr.sprite = file.GetSprite(type);
+                sr.sprite = file.GetSprite(type,start);
                 sr.sortingOrder = 2;
                 box.name = "Box " + background.pos.x +","+ background.pos.y;
                 box.type = type;
@@ -199,13 +201,69 @@ public class Match3:MonoBehaviour
                     background.type = EBackgroundType.Fill;
 
                 }
-                
+                box.dir = Vector2Int.right;
+                box.start = 0;
                 return box;
             }
             return null;
     }
 
+    private Box CreateDisplayCard(Background background, Vector2Int dir, int start)
+    {
+        Box box1;
+        int maxBox = 8- start;
 
+        box1 = createBox(background, BoxType.DisplayCard, start);
+        SpriteRenderer sr1 = background.GetComponent<SpriteRenderer>();
+        SpriteRenderer sr2 = box1.GetComponent<SpriteRenderer>();
+        float equal = sr2.bounds.size.x / sr1.bounds.size.x;
+        if (dir == Vector2Int.left) 
+            box1.transform.RotateAround(box1.transform.position, Vector3.back, 180);
+        else if (dir == Vector2Int.up)
+            box1.transform.RotateAround(box1.transform.position, Vector3.back, 270);        
+        else if (dir == Vector2Int.down)
+            box1.transform.RotateAround(box1.transform.position, Vector3.back, 90);        
+        if (dir == Vector2Int.left)
+            box1.transform.position = new Vector3( box1.transform.position.x+(equal-1)/2*sr1.bounds.size.x+0.05f,
+                                                    box1.transform.position.y, 0);
+        else if (dir == Vector2Int.right)                                         
+                    box1.transform.position = new Vector3( box1.transform.position.x-(equal-1)/2*sr1.bounds.size.x-0.05f,
+                                                    box1.transform.position.y, 0);
+        else if (dir == Vector2Int.up)
+            box1.transform.position = new Vector3( box1.transform.position.x,
+                                                    box1.transform.position.y - (equal-1)/2*sr1.bounds.size.y-0.05f, 0);
+        else if (dir == Vector2Int.down)                                                    
+                    box1.transform.position = new Vector3( box1.transform.position.x,
+                                                    box1.transform.position.y + (equal-1)/2*sr1.bounds.size.y+0.05f, 0);
+
+        box1.dir = dir;
+        box1.start = start;
+        box1.live = 7-start;
+        // 6-1 , 5-2, 4-3, 3-4,
+            
+        sr2.sortingOrder = 4;                                            
+
+        Vector2Int pos1 =  background.pos;
+        for (int i=0; i < maxBox; i++)
+        {
+            pos1 = pos1 + ( dir * new Vector2Int(-1,-1));
+            // if (dir == Vector2Int.left )
+            //     pos1 = pos1+Vector2Int.right;
+            // else if (dir == Vector2Int.right)
+            //     pos1 = pos1 + Vector2Int.left;
+            // else if (dir == Vector2Int.up)
+            //     pos1 = pos1+Vector2Int.down;
+            // else 
+            //     pos1 = pos1+Vector2Int.up;
+            Box box2 = backgrounds[pos1.x,pos1.y].box;
+            if (box2 != null)
+                Destroy(box2.gameObject);
+            backgrounds[pos1.x,pos1.y].box = box1;
+            backgrounds[pos1.x,pos1.y].type = EBackgroundType.Protected;
+
+        }
+        return box1;
+    }
     private Box CreateCookieTray(Background background)
     {
         

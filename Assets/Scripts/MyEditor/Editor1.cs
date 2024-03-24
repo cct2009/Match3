@@ -17,6 +17,8 @@ public class Editor1 : MonoBehaviour
     public TMP_InputField tColumns;
     public TMP_InputField tRows;
     private GridLayer gridLayer;
+    public TMP_Text dirIn;
+    public TMP_InputField start;
     private Background[,] backgrounds;
     private string saveFilePath1;
     private BoxData boxData;
@@ -59,6 +61,9 @@ Background background;
                 RaycastHit2D hit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(pos1));
                 if (hit.transform != null)
                 {
+                    Vector2Int dir = GetDirectionFromBoxType((BoxType) int.Parse(dirIn.text));
+                    Debug.Log("dir="+dir);
+                    int start1 = int.Parse(start.text);
                     background = hit.transform.GetComponent<Background>();
                     Debug.Log("Hit "+background.pos+": Data "+Global.backgrounds[background.pos.x, background.pos.y] );
                     BoxType subType = (BoxType) int.Parse(subTypeIn.text);
@@ -68,7 +73,7 @@ Background background;
                     else if (background.type == EBackgroundType.Protected)
                         Debug.Log("Protected don't do anything");
                     else
-                        background.box = match3.createABox(background, (BoxType) int.Parse(subTypeIn.text));
+                        background.box = match3.createABox(background, (BoxType) int.Parse(subTypeIn.text), dir, start1);
 
                 }
 
@@ -76,7 +81,16 @@ Background background;
         }     
     }
 
-
+    Vector2Int GetDirectionFromBoxType(BoxType type)
+    {
+        switch(type)
+        {
+            case BoxType.ArrowDown: return Vector2Int.down;
+            case BoxType.ArrowUp : return Vector2Int.up;
+            case BoxType.ArrowLeft: return Vector2Int.left;
+            default : return Vector2Int.right;
+        }
+    }
     public void onSave()
     {
         BoxData boxData = new BoxData();
@@ -93,6 +107,8 @@ Background background;
                     {
                         Box box = background.box;
                         bf.type = box.type;
+                        bf.dir = box.dir;
+                        bf.start = box.start;
                         bf.x = x;
                         bf.y = y;
                         boxData.layer1.Add(bf);
@@ -133,7 +149,7 @@ Background background;
         {
             Background background = gridLayer.backgrounds[bif.x,bif.y];
 
-            background.box = match3.createABox(background, bif.type);          
+            background.box = match3.createABox(background, bif.type,bif.dir,bif.start);          
 
         }
     }

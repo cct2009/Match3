@@ -51,6 +51,8 @@ public class BoxInfo
 {
     public int x, y;
     public BoxType type;
+    public Vector2Int dir;
+    public int start;
 
 }
 [Serializable]
@@ -94,6 +96,8 @@ public class Box : MonoBehaviour
 
     public EBoxState boxState;
     
+    public Vector2Int dir;
+    public int start;
     private void Start() {
             gridLayer = Global.gridLayer;
             backgrounds = gridLayer.backgrounds;    
@@ -140,7 +144,7 @@ public class Box : MonoBehaviour
         for (int row = 0; row < gridLayer.maxY; row++)
         {
             Box box1 = backgrounds[background.pos.x, row].box;
-            if (box1)
+            if (box1 && box1.background.type == EBackgroundType.Fill)
             {
                 if (box1.isEffect(box1.type))
                     box1.boxState = EBoxState.Minus;
@@ -163,7 +167,7 @@ public class Box : MonoBehaviour
         for (int col = 0; col < gridLayer.maxX; col++)
         {
             Box box1 = backgrounds[col, background.pos.y].box;
-            if (box1)
+            if (box1 && box1.background.type == EBackgroundType.Fill)
             {
                 if (box1.isEffect(box1.type))
                     box1.boxState = EBoxState.Minus;
@@ -304,7 +308,8 @@ public class Box : MonoBehaviour
     {
         return (type == BoxType.ObstructWood ||
                 type == BoxType.CookieTray  ||
-                type == BoxType.ObstructStone);
+                type == BoxType.ObstructStone ||
+                type == BoxType.DisplayCard);
     }
     public bool isJelly()
     {

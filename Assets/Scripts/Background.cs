@@ -203,6 +203,7 @@ public class Background : MonoBehaviour
                 background = backgrounds[x,y];
                 if (background.box == null) {
                     background.box = Main.Instance.match3.NewJellyRandom(background);
+                    background.type = EBackgroundType.Fill;
                 }
             }
         }
@@ -276,6 +277,7 @@ public class Background : MonoBehaviour
     {
         box.transform.DOMove(blankBackground.transform.position, Main.Instance.flowSpeed);
         blankBackground.box =  box;
+        blankBackground.type = EBackgroundType.Fill;
         box = null;
         blankBackground.box.background = blankBackground;
         yield return new WaitForSeconds(Main.Instance.flowSpeed);
@@ -311,17 +313,58 @@ public class Background : MonoBehaviour
         return null;
         
     }
+    private void SetSpritePosition(Box box)
+    {
+        
+        SpriteRenderer sr = box.background.GetComponent<SpriteRenderer>();
+        Vector2 dir = box.dir * new Vector2(-1,-1) * -sr.bounds.size.x/2f;
+        box.transform.position = box.transform.position + new Vector3(dir.x,dir.y,0);
+        // if (box.dir == Vector2Int.right)
+        //     box.transform.position = new Vector3(box.transform.position.x + sr.bounds.size.x/2f,box.transform.position.y,0);
+        // else if (box.dir == Vector2Int.left)
+        //     box.transform.position = new Vector3(box.transform.position.x - sr.bounds.size.x/2f,box.transform.position.y,0);
+        DeleteTail(box);
+
+    }
+    private void DeleteTail(Box box)
+    {
+        Vector2Int dirt = box.dir * new Vector2Int(-1,-1);
+        Vector2Int pos = box.background.pos;
+        Background background;
+        do
+        {
+            pos = pos+ dirt;
+            if (!Global.ValidPos(pos)) break;
+            background = backgrounds[pos.x,pos.y];
+
+        } while (background.box == box);
+        pos = pos - dirt;
+        background = backgrounds[pos.x,pos.y];
+        background.type = EBackgroundType.Vacant;
+        background.box = null;
+
+    }
+    private void ClearDisplayCard(Box box)
+    {
+        DeleteTail(box);
+        DeleteTail(box);
+        
+    }
     private void ReplaceSprite(Box box)
     {
         SpriteRenderer sr = box.GetComponent<SpriteRenderer>();
         sr.sprite = Global.Instance.file.GetSpriteForLive(box);
+        if (box.type == BoxType.DisplayCard)
+            SetSpritePosition(box);
         
         GameObject prefab = Global.Instance.file.GetDieAnimate(box.type);
-        if (prefab == null) prefab = Main.Instance.animate;
-        GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
-        Destroy(go,1);
+        if (prefab != null)
+        {
+            GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
+            Destroy(go,1);
+        }
     }
-
+  
     public IEnumerator DestroyMatch(List<MatchInfo> mifList)
     {
         List<Box> boxList = new List<Box>();
@@ -338,7 +381,12 @@ public class Background : MonoBehaviour
             {
                 box.live--;
                 if (box.live == 0)
+                {
+                    if (box.type == BoxType.DisplayCard)
+                        ClearDisplayCard(box);
                     box.boxState = EBoxState.Die;
+                }
+                
                 else
                     ReplaceSprite(box);
             }
