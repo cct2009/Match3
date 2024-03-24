@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.EnhancedTouch;
-using UnityEngine.UIElements;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public enum ProgramState 
@@ -200,10 +197,189 @@ public class Main : MonoBehaviour
 
                 if (background.type != EBackgroundType.Close)
                 {
-                    WriteBorder(x,y);
+                    WriteRoundBorder2(x,y);
                 }
             }
        }
+    }
+
+ private void WriteRoundBorder2(int x, int y)
+    {
+        Vector2Int pos = new Vector2Int(x,y);
+        Background background = backgrounds[x,y];
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+        Vector3 p = background.transform.position;
+        Vector2 s = sr.bounds.size;
+
+        // LEFT & DOWN
+        Vector3 p0 = new Vector3(p.x - s.x/2f, p.y,0);
+        Vector3 p1 = new Vector3(p.x - s.x/2f, p.y - s.y/4f,0);
+        Vector3 p2 = new Vector3(p.x - s.x/2f, p.y -s.y/2f,0);
+        Vector3 p3 = new Vector3(p.x - s.x/4f, p.y - s.y/2f,0);
+        Vector3 p4 = new Vector3(p.x , p.y - s.y/2f,0);
+        if (!ExistBox(pos,Vector2Int.left) && !ExistBox(pos,Vector2Int.down))
+        {
+            DrawLine(pos, p0,p1);
+            DrawCurve(pos, p1,p2,p3);
+            DrawLine(pos, p3,p4);
+        }
+        else if (!ExistBox(pos,Vector2Int.left) && ExistBox(pos,Vector2Int.left+Vector2Int.down))
+        {
+            p3 = new Vector3(p.x- 3*s.x/4f, p.y-s.y/2f,0);
+            p4 = new Vector3(p.x-s.x,p.y-s.y/2f,0);
+            DrawLine(pos, p0,p1);
+            DrawCurve(pos, p1,p2,p3);
+            DrawLine(pos, p3,p4);
+
+        }
+        else if (!ExistBox(pos,Vector2Int.left))
+            DrawLine(pos, p0, p2);
+        else if (!ExistBox(pos,Vector2Int.down) && ExistBox(pos,Vector2Int.down+Vector2Int.left))
+        {
+            Debug.Log("Already write in up/right");
+        }    
+        else if (!ExistBox(pos,Vector2Int.down))
+            DrawLine(pos,p2,p4);
+
+        // RIGHT & DOWN
+        p0 = new Vector3(p.x , p.y - s.y/2f,0);
+        p1 = new Vector3(p.x + s.x/4f , p.y - s.y/2f,0);
+        p2 = new Vector3(p.x + s.x/2f, p.y -s.y/2f,0);
+        p3 = new Vector3(p.x + s.x/2f, p.y - s.y/4f ,0);
+        p4 = new Vector3(p.x + s.x/2f, p.y ,0);
+        if (!ExistBox(pos,Vector2Int.down) && !ExistBox(pos,Vector2Int.right))
+        {
+                DrawLine(pos, p0,p1);
+                DrawCurve(pos, p1,p2,p3);
+                DrawLine(pos, p3,p4);
+        }
+        else if (!ExistBox(pos,Vector2Int.down) && ExistBox(pos,Vector2Int.right+Vector2Int.down))
+        {
+                p3 = new Vector3( p.x+s.x/2f , p.y -3*s.y/4f,0);
+                p4 = new Vector3( p.x+s.x/2f, p.y-s.y,0);
+                DrawLine(pos, p0,p1);
+                DrawCurve(pos, p1,p2,p3);
+                DrawLine(pos, p3,p4);
+
+        }
+        else if (!ExistBox(pos,Vector2Int.down))
+            DrawLine(pos, p0, p2);
+        else if (!ExistBox(pos,Vector2Int.right) && ExistBox(pos,Vector2Int.right+Vector2Int.down))
+        {
+                p1 = new Vector3(p.x+3*s.x/4f, p.y-s.y/2f,0);
+                p0 = new Vector3(p.x+s.x, p.y-s.y/2f, 0);
+                DrawLine(pos, p0,p1);
+                DrawCurve(pos, p1,p2,p3);
+                DrawLine(pos, p3,p4);
+        }
+        else if (!ExistBox(pos,Vector2Int.right))
+            DrawLine(pos,p2,p4);
+
+        // RIGHT & UP
+        p0 = new Vector3(p.x + s.x/2f, p.y ,0);
+        p1 = new Vector3(p.x + s.x/2f, p.y+ s.y/4f ,0);
+        p2 = new Vector3(p.x + s.x/2f, p.y +s.y/2f,0);
+        p3 = new Vector3(p.x + s.x/4f , p.y + s.y/2f,0);
+        p4 = new Vector3(p.x , p.y + s.y/2f,0);
+        if (!ExistBox(pos,Vector2Int.right) && !ExistBox(pos,Vector2Int.up))
+        {
+            DrawLine(pos, p0,p1);
+            DrawCurve(pos, p1,p2,p3);
+            DrawLine(pos, p3,p4);
+        }
+        else if (!ExistBox(pos,Vector2Int.right) && ExistBox(pos,Vector2Int.right+Vector2Int.up))
+        {
+            p3 = new Vector3(p.x+ s.x*3 /4f,p.y+s.y/2f,0);
+            p4 = new Vector3(p.x+s.x, p.y+s.y/2f,0);
+            DrawLine(pos, p0,p1);
+            DrawCurve(pos, p1,p2,p3);
+            DrawLine(pos, p3,p4);
+
+        }
+            
+        else if (!ExistBox(pos,Vector2Int.right))
+            DrawLine(pos, p0, p2);
+        else if (!ExistBox(pos,Vector2Int.up) && ExistBox(pos,Vector2Int.right+Vector2Int.up))
+        {
+            Debug.Log("Already write in left /down");
+        }
+        else if (!ExistBox(pos,Vector2Int.up))
+            DrawLine(pos,p2,p4);
+
+        // LEFT & UP
+        p0 = new Vector3(p.x , p.y + s.y/2f,0);
+        p1 = new Vector3(p.x - s.x/4f, p.y + s.y/2f,0);
+        p2 = new Vector3(p.x - s.x/2f, p.y +s.y/2f,0);
+        p3 = new Vector3(p.x - s.x/2f , p.y + s.y/4f ,0);
+        p4 = new Vector3(p.x - s.x/2f , p.y ,0);
+        if (!ExistBox(pos,Vector2Int.up) && !ExistBox(pos,Vector2Int.left))
+        {
+            DrawLine(pos, p0,p1);
+            DrawCurve(pos, p1,p2,p3);
+            DrawLine(pos, p3,p4);
+        }
+        else if (!ExistBox(pos,Vector2Int.up) && ExistBox(pos,Vector2Int.up+Vector2Int.left))
+        {
+            Debug.Log("Already write in up/right");
+        }
+        else if (!ExistBox(pos,Vector2Int.up))
+            DrawLine(pos, p0, p2);
+        else if (!ExistBox(pos,Vector2Int.left) && ExistBox(pos,Vector2Int.left+Vector2Int.up))
+        {
+            Debug.Log("Already write in right/down");
+        }
+        else if (!ExistBox(pos,Vector2Int.left))
+            DrawLine(pos,p2,p4);
+
+    }
+    private void WriteRoundBorder(int x, int y)
+    {
+        Vector2Int pos = new Vector2Int(x,y);
+        Background background = backgrounds[x,y];
+        SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
+        Vector3 p = background.transform.position;
+        Vector2 s = sr.bounds.size;
+
+        Vector3 p1 = new Vector3(p.x - s.x/2f, p.y,0);
+        Vector3 p2 = new Vector3(p.x - s.x/2f, p.y -s.y/2f,0);
+        Vector3 p3 = new Vector3(p.x , p.y - s.y/2f,0);
+        if (!ExistBox(pos,Vector2Int.left) && !ExistBox(pos,Vector2Int.down))
+            DrawCurve(pos, p1,p2,p3);
+        else if (!ExistBox(pos,Vector2Int.left))
+            DrawLine(pos, p1, p2);
+        else if (!ExistBox(pos,Vector2Int.down))
+            DrawLine(pos,p2,p3);
+
+        p1 = new Vector3(p.x , p.y - s.y/2f,0);
+        p2 = new Vector3(p.x + s.x/2f, p.y -s.y/2f,0);
+        p3 = new Vector3(p.x + s.x/2f, p.y ,0);
+        if (!ExistBox(pos,Vector2Int.down) && !ExistBox(pos,Vector2Int.right))
+            DrawCurve(pos, p1,p2,p3);
+        else if (!ExistBox(pos,Vector2Int.down))
+            DrawLine(pos, p1, p2);
+        else if (!ExistBox(pos,Vector2Int.right))
+            DrawLine(pos,p2,p3);
+
+        p1 = new Vector3(p.x + s.x/2f, p.y ,0);
+        p2 = new Vector3(p.x + s.x/2f, p.y +s.y/2f,0);
+        p3 = new Vector3(p.x , p.y + s.y/2f,0);
+        if (!ExistBox(pos,Vector2Int.right) && !ExistBox(pos,Vector2Int.up))
+            DrawCurve(pos, p1,p2,p3);
+        else if (!ExistBox(pos,Vector2Int.right))
+            DrawLine(pos, p1, p2);
+        else if (!ExistBox(pos,Vector2Int.up))
+            DrawLine(pos,p2,p3);
+
+        p1 = new Vector3(p.x , p.y + s.y/2f,0);
+        p2 = new Vector3(p.x - s.x/2f, p.y +s.y/2f,0);
+        p3 = new Vector3(p.x - s.x/2f , p.y ,0);
+        if (!ExistBox(pos,Vector2Int.up) && !ExistBox(pos,Vector2Int.left))
+            DrawCurve(pos, p1,p2,p3);
+        else if (!ExistBox(pos,Vector2Int.up))
+            DrawLine(pos, p1, p2);
+        else if (!ExistBox(pos,Vector2Int.left))
+            DrawLine(pos,p2,p3);
+
     }
     private void WriteBorder(int x, int y)
     {
@@ -212,28 +388,28 @@ public class Main : MonoBehaviour
         SpriteRenderer sr = background.GetComponent<SpriteRenderer>();
 
         Debug.Log("Write Border "+pos+"["+background.type+"]");
-        if (!ValidBorder(pos, Vector2Int.left)) {
+        if (!ExistBox(pos, Vector2Int.left)) {
             Vector3 point1 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
             Vector3 point2 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
             DrawLine(pos,point1, point2);
             
         }
 
-        if (!ValidBorder(pos, Vector2Int.down)) {
+        if (!ExistBox(pos, Vector2Int.down)) {
             Vector3 point1 = new Vector3(background.transform.position.x - sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
             Vector3 point2 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
             DrawLine(pos,point1, point2);
             
         }
 
-        if (!ValidBorder(pos, Vector2Int.right)) {
+        if (!ExistBox(pos, Vector2Int.right)) {
             Vector3 point1 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y-sr.bounds.size.y/2f,0);
             Vector3 point2 = new Vector3(background.transform.position.x+ sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
             DrawLine(pos,point1, point2);
             
         }
 
-        if (!ValidBorder(pos, Vector2Int.up)) {
+        if (!ExistBox(pos, Vector2Int.up)) {
             Vector3 point1 = new Vector3(background.transform.position.x + sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
             Vector3 point2 = new Vector3(background.transform.position.x- sr.bounds.size.x/2f, background.transform.position.y+sr.bounds.size.y/2f,0);
             DrawLine(pos,point1, point2);
@@ -242,7 +418,27 @@ public class Main : MonoBehaviour
         
     }
 
-    private bool ValidBorder(Vector2Int pos, Vector2Int dir)
+    private int numberOfPoints = 10;
+    void DrawCurve(Vector2Int pos, Vector3 p0, Vector3 p1, Vector3 p2)
+    {
+        float t;
+		Vector3 position;
+        lr2.sortingOrder  = 4;
+        lr2.startWidth = 0.02f;
+        lr2.endWidth = 0.02f;
+        lr2.positionCount = numberOfPoints;
+        LineRenderer lr = Instantiate(lr2,lr1.transform);
+        lr.name = "LR " + pos;
+
+		for(int i = 0; i < numberOfPoints; i++)
+		{
+			t = i / (numberOfPoints - 1.0f);
+			position = (1.0f - t) * (1.0f - t) * p0 
+			+ 2.0f * (1.0f - t) * t * p1 + t * t * p2;
+			lr.SetPosition(i, position);
+		}
+    }
+    private bool ExistBox(Vector2Int pos, Vector2Int dir)
     {
         if (!Global.ValidPos(pos+dir)) return false;
         Vector2Int pos1 = pos+dir;

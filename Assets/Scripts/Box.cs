@@ -4,7 +4,7 @@ using DG.Tweening;
 using UnityEngine;
 using System;
 using System.Linq;
-using Unity.VisualScripting;
+
 
 
 
@@ -39,6 +39,7 @@ public enum BoxType
     ArmerChain = 42,
 
     CookieTray = 51,
+    DisplayCard = 52,
     ArrowDown = 100,
     ArrowLeft = 101,
     ArrowRight = 102,

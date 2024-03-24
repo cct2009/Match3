@@ -14,7 +14,7 @@ public class Global : MonoBehaviour
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        if (!file.onLoadBoxData(3)) {
+        if (!file.onLoadBoxData(4)) {
             return;
         }
         gridLayer = new GridLayer();
