@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Linq;
-using System.IO;
+
 
 
 public enum EBackgroundType{
@@ -26,54 +26,13 @@ public class Background : MonoBehaviour
         backgrounds = gridLayer.backgrounds; 
                
     }
-    public IEnumerator ShowCanMatch()
-    {
-        Background background;
-        bool exit = false;
-        for (int y=0; y < gridLayer.maxY && !exit; y++)
-        {
-            for (int x=0; x < gridLayer.maxX && !exit; x++)
-            {
-                background = backgrounds[x,y];
-                if (!background.box.isJelly()) continue;
-                foreach(Vector2Int dir in Global.dirs)
-                {
-                    Vector2Int nextPos = background.pos+dir;
-                    if (Global.ValidPos(nextPos)) {
-                        Background nextBackground = backgrounds[nextPos.x,nextPos.y];
-                        if (!nextBackground.box.isJelly()) continue;
-                        
-                        background.SwapPosition(nextBackground);
+  
 
-                        List<MatchInfo> mifList = new List<MatchInfo>();
-                        background.box.checkJellyMatch(ref mifList, false);
-                        if (mifList.Count > 0) {
-                            PrintMIFList(mifList);
-                            exit = true;
-                            break;
-                        }
-
-                            
-//                        background2.box.checkJellyMatch(ref mifList);  
-                    }
-
-                }
-
-            }
-        }
-        yield return null;
-    }
-
-    void PrintMIFList(List<MatchInfo> mifList)
-    {
-        int i =0;
-        foreach(MatchInfo mif in mifList)
-        {
-            i++;
-            Debug.Log("List "+i);
-            box.PrintMatchInfo(mif);
-            
-        }
+    private void OnTriggerEnter2D(Collider2D other) {
+        Debug.Log(name+" trigger by "+other.name);
+        if (box != null && this.type != EBackgroundType.Close)
+            box.DestroyAnimateBox();
+        
     }
     public IEnumerator SwitchItem(Vector2Int swipeDirection)
     {
@@ -100,7 +59,11 @@ public class Background : MonoBehaviour
                 List<MatchInfo> mifList = new List<MatchInfo>();
 
                 if (box.IsPower4() || background2.box.IsPower4())
-                    SwitchPower4(box, background2.box,ref mifList);
+                {
+                    yield return SwitchPower4(box, background2.box);
+                    // yield return FlowBoxToBlank();
+                }
+                    
                 else
                 {
                     box.checkJellyMatch(ref mifList);
@@ -132,7 +95,26 @@ public class Background : MonoBehaviour
     
     }
     
-    void SwitchPower4(Box box1, Box box2, ref List<MatchInfo> mifList)
+    IEnumerator SwitchPower4(Box box1, Box box2)
+    {   
+        if (box1.IsPower4() && box2.IsPower4())
+        {
+            Debug.Log("SwitchPower4 when both are power4");
+        }
+        else if (box1.IsPower4())
+        {
+            // box2.checkJellyMatch(ref mifList);
+            yield return box1.launchPower4();
+        }
+        else if (box2.IsPower4())
+        {
+            // box1.checkJellyMatch(ref mifList);
+            yield return box2.launchPower4();
+        }
+        
+
+    }
+    void SwitchPower4_0(Box box1, Box box2, ref List<MatchInfo> mifList)
     {   
         if (box1.IsPower4() && box2.IsPower4())
         {
@@ -176,7 +158,7 @@ public class Background : MonoBehaviour
         background2.box.background = tempB;
 
     }
-    IEnumerator FlowBoxToBlank()
+    public IEnumerator FlowBoxToBlank()
     {
         Background canMoveBackground, blankBackground;
         while (CanFlow(out canMoveBackground, out blankBackground) ) {
@@ -272,7 +254,7 @@ public class Background : MonoBehaviour
         blankBackground = null;
         return false;
     }
-    
+    static int ypos=-1;
     IEnumerator FlowBlank( Background blankBackground)
     {
         box.transform.DOMove(blankBackground.transform.position, Main.Instance.flowSpeed);
@@ -280,7 +262,14 @@ public class Background : MonoBehaviour
         blankBackground.type = EBackgroundType.Fill;
         box = null;
         blankBackground.box.background = blankBackground;
-        yield return new WaitForSeconds(Main.Instance.flowSpeed);
+        if (ypos != -1 && blankBackground.pos.y != ypos)
+        {
+            ypos = blankBackground.pos.y;
+            yield return new WaitForSeconds(Main.Instance.flowSpeed);
+            
+        }
+        
+        // yield return new WaitForSeconds(Main.Instance.flowSpeed);
         
         
     }
@@ -308,6 +297,7 @@ public class Background : MonoBehaviour
         Vector2Int pos = box.background.pos + dir;
         if (!Global.ValidPos(pos)) return null;
         Box expBox = backgrounds[pos.x,pos.y].box;
+        if (expBox == null) return null;
         if (expBox.isEffect(expBox.type)) 
             return expBox;
         return null;

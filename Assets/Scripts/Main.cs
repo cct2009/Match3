@@ -1,6 +1,9 @@
 using System;
 using TMPro;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
@@ -45,6 +48,8 @@ public class Main : MonoBehaviour
     public GameObject animate;
     
     public GoalData[] goals;
+    public ParticleSystem tail;
+    public GameObject prefabPower4;
 
     private void Awake() {
         if (Instance == null)
@@ -61,7 +66,6 @@ public class Main : MonoBehaviour
     {
 
         matchPanel.CreateGrid(gridLayer);
-
         match3.Init(Global.Instance.file);
         match3.DrawBox();
         match3.LoadDirection(DirectionVersion);
@@ -70,6 +74,7 @@ public class Main : MonoBehaviour
         programState = ProgramState.InitData;
         
     }
+
     public void onLoadLevel()
     {
         if (Global.Instance.file.onLoadBoxData(int.Parse(level.text)))
@@ -99,6 +104,13 @@ public class Main : MonoBehaviour
         
     }
 
+    public void TestPS()
+    {
+        var lifetimeByEmitterSpeed = tail.lifetimeByEmitterSpeed;
+        lifetimeByEmitterSpeed.curveMultiplier = 4;
+        DOTween.To(x=>lifetimeByEmitterSpeed.curveMultiplier = x ,0,5,10f);
+
+    }
     Background background;
     Vector2 pos1,pos2,swipe;
     Vector2Int swipeDirection;
@@ -116,8 +128,9 @@ public class Main : MonoBehaviour
                 RaycastHit2D hit = Physics2D.GetRayIntersection(Camera.main.ScreenPointToRay(pos1));
                 if (hit.transform != null)
                 {
+                    Debug.Log("hit "+hit.transform.name);
                     background = hit.transform.GetComponent<Background>();
-                 //   Debug.Log("Hit "+background.pos+": Data "+gridLayer.backgrounds[background.pos.x, background.pos.y] );
+                    Debug.Log("Hit "+background.pos+": Data "+gridLayer.backgrounds[background.pos.x, background.pos.y] );
 
                 }
 
@@ -142,19 +155,18 @@ public class Main : MonoBehaviour
                 } else if (swipe.x > 0 && swipe.y > -0.5f && swipe.y < 0.5f) {
                     swipeDirection = Vector2Int.right;
                 }
-                programState = ProgramState.Animation;
+                
             //    Debug.Log(background.jelly);
                 if (background)
-                StartCoroutine(background.SwitchItem(swipeDirection));
+                {
+                    programState = ProgramState.Animation;
+                    StartCoroutine(background.SwitchItem(swipeDirection));
+                }
+                
             }
 
         }
-        else
-        {
-            //show box can swipe to match
-            // background = backgrounds[0,0];
-            // StartCoroutine(background.ShowCanMatch());
-        }
+
     }
     public void AddTimes(int added)
     {

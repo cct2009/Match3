@@ -65,7 +65,7 @@ Background background;
                     Debug.Log("dir="+dir);
                     int start1 = int.Parse(start.text);
                     background = hit.transform.GetComponent<Background>();
-                    Debug.Log("Hit "+background.pos+": Data "+Global.backgrounds[background.pos.x, background.pos.y] );
+      //              Debug.Log("Hit "+background.pos+": Data "+Global.backgrounds[background.pos.x, background.pos.y] );
                     BoxType subType = (BoxType) int.Parse(subTypeIn.text);
 
                     if (background.box != null && background.box.type == subType)

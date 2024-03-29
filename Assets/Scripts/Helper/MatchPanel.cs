@@ -95,7 +95,7 @@ public class MatchPanel : MonoBehaviour
                     square = square1;
 
                 BoxCollider2D box = background.GetComponent<BoxCollider2D>();
-                box.size = new Vector2(1,1);
+                box.size = new Vector2(0.95f,0.95f);
             }
         }
 

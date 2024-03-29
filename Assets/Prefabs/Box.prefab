@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 401382726169022397}
   - component: {fileID: 1881485338736923875}
   - component: {fileID: 8891583316880175772}
-  - component: {fileID: 3586292709251699196}
+  - component: {fileID: -1290242202801585112}
   m_Layer: 0
   m_Name: Box
   m_TagString: Untagged
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.8515625, y: 0.7890625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -98,10 +98,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485185631e8abb240ab87412faa400bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shortModule: 0
-  subType: 0
+  type: 0
   background: {fileID: 0}
---- !u!61 &3586292709251699196
+  move: 0
+  live: 0
+  DieAnimate: {fileID: 0}
+  boxState: 0
+  dir: {x: 0, y: 0}
+  start: 0
+--- !u!61 &-1290242202801585112
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

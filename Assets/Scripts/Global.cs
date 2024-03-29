@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Global : MonoBehaviour
@@ -8,13 +6,14 @@ public class Global : MonoBehaviour
      public static GridLayer gridLayer;
      public static Background[,] backgrounds;
     public  FileData file;
+    public SpriteMask spm;
     static public Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
     private void Awake() {
         if (Instance == null)
             Instance = this;
         if (Instance != this)
             Destroy(this);        
-        if (!file.onLoadBoxData(2)) {
+        if (!file.onLoadBoxData(1)) {
             return;
         }
         gridLayer = new GridLayer();

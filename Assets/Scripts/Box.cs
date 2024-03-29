@@ -1,9 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using System;
 using System.Linq;
+using System.Collections;
 
 
 
@@ -103,6 +103,7 @@ public class Box : MonoBehaviour
             backgrounds = gridLayer.backgrounds;    
     }
     
+
     private void TranzformMatch(ref MatchInfo mif)
     {   // เปลี่ยน jelly เป็น powerup กรณี match 4, 5 
         // ตั้งค่า boxState เป็น Die หรือ Live
@@ -129,6 +130,56 @@ public class Box : MonoBehaviour
         
 
     }
+
+    public IEnumerator launchPower4()
+    {
+        float time = 0.3f;
+        DestroyAnimateBox();
+        GameObject panel = GameObject.Find("Panel");
+        GameObject power4_1, power4_2;
+        Rigidbody2D rg1, rg2;
+        if (type == BoxType.PowerUpHor)
+        {
+            power4_1 = Instantiate(Main.Instance.prefabPower4, transform.position, 
+                                    Quaternion.Euler(new Vector3(0,0,180)),panel.transform);
+            power4_2 = Instantiate(Main.Instance.prefabPower4, transform.position, 
+                                    Quaternion.Euler(new Vector3(0,0,0)),panel.transform);
+            rg1 = power4_1.transform.Find("PowerUpHor1").GetComponent<Rigidbody2D>();                                             
+            rg2 = power4_2.transform.Find("PowerUpHor1").GetComponent<Rigidbody2D>();                                             
+            rg1.DOMoveX(power4_1.transform.position.x-6,time);
+            rg2.DOMoveX(power4_1.transform.position.x+6,time);
+            // power4_1.transform.DOMoveX(power4_1.transform.position.x-6,time);
+            // power4_2.transform.DOMoveX(power4_1.transform.position.x+6,time);
+
+        }
+        else
+        {
+            power4_1 = Instantiate(Main.Instance.prefabPower4, transform.position, 
+                                    Quaternion.Euler(new Vector3(0,0,90)),panel.transform);
+            power4_2 = Instantiate(Main.Instance.prefabPower4, transform.position, 
+                                    Quaternion.Euler(new Vector3(0,0,270)),panel.transform);
+            rg1 = power4_1.transform.Find("PowerUpHor1").GetComponent<Rigidbody2D>();                                             
+            rg2 = power4_2.transform.Find("PowerUpHor1").GetComponent<Rigidbody2D>();                                             
+            rg1.DOMoveY(power4_1.transform.position.y+6,time);
+            rg2.DOMoveY(power4_1.transform.position.y-6,time);
+            // power4_1.transform.DOMoveY(power4_1.transform.position.y+6,time);
+            // power4_2.transform.DOMoveY(power4_1.transform.position.y-6,time);
+
+        }
+        ParticleSystem ps1 = power4_1.transform.Find("PowerUpHor1/Meteor/Trail").GetComponent<ParticleSystem>();
+        var le1 = ps1.lifetimeByEmitterSpeed;
+        DOTween.To(x=>le1.curveMultiplier=x,1.5f,4,time);
+        ParticleSystem ps2 = power4_2.transform.Find("PowerUpHor1/Meteor/Trail").GetComponent<ParticleSystem>();
+        Debug.Log(ps2.name);
+        var le2 = ps2.lifetimeByEmitterSpeed;
+        DOTween.To(x=>le2.curveMultiplier=x,1.5f,4,time);
+
+        Destroy(power4_1.gameObject,time+0.2f);
+        Destroy(power4_2.gameObject,time+0.2f);
+        yield return new WaitForSeconds(time/2);
+    }
+            
+    
     public void checkPower4Match(ref List<MatchInfo> mifList)
     {
         if (!IsPower4()) return;
@@ -213,7 +264,7 @@ public class Box : MonoBehaviour
                 if (tranzform)
                     TranzformMatch(ref mif);
                 mifList.Add(mif);
-                PrintMatchInfo(mif);
+                Main.Instance.match3.PrintMatchInfo(mif);
             }
 
         }
@@ -252,6 +303,7 @@ public class Box : MonoBehaviour
     {
         Vector2Int pos = background.pos + dir;
         if (!Global.ValidPos(pos)) return false;
+        if (backgrounds[pos.x,pos.y].box == null) return false;
         return backgrounds[pos.x,pos.y].box.type == type;
         
     }
@@ -275,7 +327,12 @@ public class Box : MonoBehaviour
         return matchList;
     }
     
-
+    public void DestroyAnimateBox()
+    {
+        boxState = EBoxState.Die;
+        AnimateBox(this);
+        DestroyBox();
+    }
     public void DestroyBox()
     {
         if (background)
@@ -291,19 +348,25 @@ public class Box : MonoBehaviour
     {
         foreach(Box box in list)
         {
-            if (box.boxState == EBoxState.Die)
-            {
-                GameObject prefab = Global.Instance.file.GetDieAnimate(box.type);
-                if (prefab == null) prefab = Main.Instance.animate;
-                GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
-                box.transform.DOScale(0,Main.Instance.dieSpeed);
-                Destroy(go,1);
-            }
-                
+            AnimateBox(box);
+
         }
-//        yield return new WaitForSeconds(0.6f);
+        //        yield return new WaitForSeconds(0.6f);
 
     }
+
+    private void AnimateBox(Box box)
+    {
+        if (box.boxState == EBoxState.Die)
+        {
+            GameObject prefab = Global.Instance.file.GetDieAnimate(box.type);
+            if (prefab == null) prefab = Main.Instance.animate;
+            GameObject go = Instantiate(prefab, box.transform.position, box.transform.rotation);
+            box.transform.DOScale(0, Main.Instance.dieSpeed);
+            Destroy(go, 1);
+        }
+    }
+
     public bool isEffect(BoxType type)
     {
         return (type == BoxType.ObstructWood ||
@@ -388,18 +451,7 @@ public void DrawBorder(List<Box> list,LineRenderer lr)
 //            lr.SetPosition(i,ly.transform.position);
 
     }
-   public void PrintMatchInfo(MatchInfo mif)
-   {
-        string s = mif.type + " "+ mif.boxList.Count+"-";
-        int i =0;
-        foreach(Box box in mif.boxList)
-        {
-            s += box.background.pos + "["+box.type + "],";
-            i++;
-        }
-            
-        Debug.Log(s);
-   }
+
 
     
 

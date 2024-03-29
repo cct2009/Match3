@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.UIElements;
 
 public class Match3:MonoBehaviour
 {
@@ -196,16 +194,25 @@ public class Match3:MonoBehaviour
                     background.type = EBackgroundType.Close;
                 }
                 else
-                {
-                    sr2.color = new Color(255,255,255,255);
-                    background.type = EBackgroundType.Fill;
+            {
+                sr2.color = new Color(255, 255, 255, 255);
+                background.type = EBackgroundType.Fill;
+        //        createSpriteMask(background);
 
-                }
-                box.dir = Vector2Int.right;
+            }
+            box.dir = Vector2Int.right;
                 box.start = 0;
                 return box;
             }
             return null;
+    }
+
+    private void createSpriteMask(Background background)
+    {
+        GameObject panel = GameObject.Find("Panel");
+        SpriteMask sm = Instantiate(Global.Instance.spm, background.transform.position, Quaternion.identity, panel.transform);
+        sm.transform.position = background.transform.position;
+        sm.transform.localScale = background.transform.localScale;
     }
 
     private Box CreateDisplayCard(Background background, Vector2Int dir, int start)
@@ -241,25 +248,19 @@ public class Match3:MonoBehaviour
         box1.live = 7-start;
         // 6-1 , 5-2, 4-3, 3-4,
             
-        sr2.sortingOrder = 4;                                            
+        sr2.sortingOrder = 2;                                            
 
         Vector2Int pos1 =  background.pos;
         for (int i=0; i < maxBox; i++)
         {
             pos1 = pos1 + ( dir * new Vector2Int(-1,-1));
-            // if (dir == Vector2Int.left )
-            //     pos1 = pos1+Vector2Int.right;
-            // else if (dir == Vector2Int.right)
-            //     pos1 = pos1 + Vector2Int.left;
-            // else if (dir == Vector2Int.up)
-            //     pos1 = pos1+Vector2Int.down;
-            // else 
-            //     pos1 = pos1+Vector2Int.up;
-            Box box2 = backgrounds[pos1.x,pos1.y].box;
+            Background background1 = backgrounds[pos1.x,pos1.y];
+            Box box2 = background1.box;
             if (box2 != null)
                 Destroy(box2.gameObject);
-            backgrounds[pos1.x,pos1.y].box = box1;
-            backgrounds[pos1.x,pos1.y].type = EBackgroundType.Protected;
+            background1.box = box1;
+            background1.type = EBackgroundType.Protected;
+     //       createSpriteMask(background1);
 
         }
         return box1;
@@ -284,11 +285,13 @@ public class Match3:MonoBehaviour
 
         for (int i=0; i < 3; i++)
         {
-            Box box = backgrounds[pos[i].x,pos[i].y].box;
+            Background background1 = backgrounds[pos[i].x,pos[i].y];
+            Box box = background1.box;
             if (box != null)
                 Destroy(box.gameObject);
-            backgrounds[pos[i].x,pos[i].y].box = box1;
-            backgrounds[pos[i].x,pos[i].y].type = EBackgroundType.Protected;
+            background1.box = box1;
+            background1.type = EBackgroundType.Protected;
+      //      createSpriteMask(background1);
             
         }
         return box1;
@@ -301,4 +304,69 @@ public class Match3:MonoBehaviour
 
           return createBox(background, subType);
     }
+
+    public void ShowCanMatch()
+    {
+        Background background;
+        bool exit = false;
+        for (int y=0; y < gridLayer.maxY && !exit; y++)
+        {
+            for (int x=0; x < gridLayer.maxX && !exit; x++)
+            {
+                background = backgrounds[x,y];
+                if (!background.box.isJelly()) continue;
+                foreach(Vector2Int dir in Global.dirs)
+                {
+                    Vector2Int nextPos = background.pos+dir;
+                    if (Global.ValidPos(nextPos)) {
+                        Background nextBackground = backgrounds[nextPos.x,nextPos.y];
+                        if (!nextBackground.box.isJelly()) continue;
+                        
+                        background.SwapPosition(nextBackground);
+
+                        List<MatchInfo> mifList = new List<MatchInfo>();
+                        background.box.checkJellyMatch(ref mifList, false);
+                        if (mifList.Count > 0) {
+                            PrintMIFList(mifList);
+                            background.SwapPosition(nextBackground);
+                            exit = true;
+                            break;
+                        }
+                        background.SwapPosition(nextBackground);
+
+                            
+//                        background2.box.checkJellyMatch(ref mifList);  
+                    }
+
+                }
+
+            }
+        }
+        
+    }
+    void PrintMIFList(List<MatchInfo> mifList)
+    {
+        int i =0;
+        foreach(MatchInfo mif in mifList)
+        {
+            i++;
+            Debug.Log("List "+i);
+            PrintMatchInfo(mif);
+            
+        }
+    }
+    
+   public void PrintMatchInfo(MatchInfo mif)
+   {
+        string s = mif.type + " "+ mif.boxList.Count+"-";
+        int i =0;
+        foreach(Box box in mif.boxList)
+        {
+            s += box.background.pos + "["+box.type + "],";
+            i++;
+        }
+            
+        Debug.Log(s);
+   }
+
 }
