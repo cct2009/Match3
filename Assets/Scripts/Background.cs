@@ -65,7 +65,7 @@ public class Background : MonoBehaviour
                 if (box.IsPower4() || background2.box.IsPower4())
                 {
                     yield return SwitchPower4(box, background2.box);
-                    // yield return FlowBoxToBlank();
+                    yield return FlowBoxToBlank();
                 }
                     
                 else
@@ -164,52 +164,17 @@ public class Background : MonoBehaviour
     }
     public IEnumerator FlowBoxToBlank()
     {
-        List<List<Background>> allList = new List<List<Background>>();
-        List<List<Background>> dupList = new List<List<Background>>();
-        List<List<Background>> linesList = new List<List<Background>>();
-        foreach (Background background in gridLayer.enterPoints)
-        {
-            List<Background> lines;
-            lines = GetLines(background);
-            allList.Add(lines);
-        }
 
-        // 
-        for (int i=0; i < allList.Count ;i++)
-        {
-            for (int j=i+1; j <allList.Count ; j++)
-            {
-                var result = allList[i].Where(x => allList[j].Contains(x));
-                if (result.Count() > 0)
-                {
-                    if (!dupList.Contains(allList[i])) dupList.Add(allList[i]);
-                    if (!dupList.Contains(allList[j])) dupList.Add(allList[j]);
-                }
-            }
-        }
-        for (int i =0; i < allList.Count;i++)
-        {
-            if (dupList.Contains(allList[i])) continue;
-            linesList.Add(allList[i]);
-        }
-        foreach(List<Background> list in dupList)
-        {
-            list.Reverse(); // so run from exit point to enter point
-        }
-        foreach(List<Background> list in linesList)
-        {
-            list.Reverse();
-        }
-        ResetFromTo();
-        foreach(List<Background> list in linesList)
+        Global.ResetFromTo();
+        foreach (List<Background> list in Global.gridLayer.linesList)
         {
             StartCoroutine(flowPipe(list));
         }
-        foreach(List<Background> list in dupList)
+        foreach (List<Background> list in Global.gridLayer.dupList)
         {
             yield return flowPipe(list);
-            ResetFromTo();
-//            yield return new WaitForSeconds(2f);
+            Global.ResetFromTo();
+            //            yield return new WaitForSeconds(2f);
         }
         yield return new WaitForSeconds(0.2f);
         Main.Instance.match3.FillInBlank();
@@ -222,18 +187,10 @@ public class Background : MonoBehaviour
         }
         // yield return null;
     }
-    void ResetFromTo()
-    {
-        for (int y=0; y < gridLayer.maxY; y++)
-        {
-            for (int x =0; x < gridLayer.maxX; x++)
-            {
-                Background background = backgrounds[x,y];
-                background.moveFrom = null;
-                background.moveTo = null;
-            }
-        }
-    }
+
+    
+
+  
     IEnumerator flowPipe(List<Background> lineList)
     {
         List<Background> listMove = new List<Background>();
@@ -291,7 +248,7 @@ public class Background : MonoBehaviour
         }
         return background;
     }
-    Background getPrev()
+    public Background getPrev()
     {
         Background background;
         Vector2Int pos1 = pos - flow;
@@ -302,7 +259,7 @@ public class Background : MonoBehaviour
 
         return background;
     }
-    Background getNext()
+    public Background getNext()
     {
         Background background;
         Vector2Int pos1 = pos + flow;
@@ -312,20 +269,7 @@ public class Background : MonoBehaviour
             return null;
         return background;
     }
-    private List<Background> GetLines(Background enterPoint)
-    {   // get list of backgrounds in the same line from enterPoint to exitPoint
-        List<Background> lines = new List<Background>();
-        Vector2Int pos = enterPoint.pos;
 
-        while (Global.ValidPos(pos)) {
-            lines.Add(enterPoint);
-            pos = pos + enterPoint.flow;
-            if (Global.ValidPos(pos))
-                enterPoint = backgrounds[pos.x,pos.y];
-
-        }
-        return lines;
-    }
     
     public IEnumerator FlowBoxToBlank_1()
     {

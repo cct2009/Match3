@@ -27,6 +27,8 @@ public struct GridLayer
     public List<Background> exitPoints;
     public int maxX, maxY;
     public Background[,] backgrounds;
+    public List<List<Background>> dupList;
+    public List<List<Background>> linesList;
 }
 public class Main : MonoBehaviour
 {
@@ -71,6 +73,7 @@ public class Main : MonoBehaviour
         match3.Init(Global.Instance.file);
         match3.DrawBox();
         match3.LoadDirection(DirectionVersion);
+        Global.createPointList();
         DrawDynamicBorder();
 
         programState = ProgramState.InitData;

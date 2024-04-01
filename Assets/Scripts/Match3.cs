@@ -79,6 +79,40 @@ public class Match3:MonoBehaviour
     }
     IEnumerator FillByRows(List<Box> boxList, Background runPoint)
     {
+        float time = 0.1f;
+        List<Background> backList = new List<Background>();
+
+
+        SpriteRenderer sr = runPoint.GetComponent<SpriteRenderer>();
+        Vector2 incr = runPoint.flow * new Vector2(1,1) * sr.bounds.size.x;
+
+        for (int i = 0; i < boxList.Count; i++)
+        {
+            backList.Add(runPoint);
+            backList.Reverse();
+            for (int j = 0; j < boxList.Count; j++)
+            {
+                Box box = boxList[j];
+                Vector3 pos;
+                if (j < backList.Count)
+                    pos = backList[j].transform.position;
+                else
+                    pos = box.transform.position + new Vector3(incr.x, incr.y,0);
+                
+                box.transform.DOMove(pos, time);
+            }
+            backList.Reverse();
+            runPoint = runPoint.getNext();
+            if (runPoint == null)
+                Debug.Log("Program Bug!! it must not be null");
+            yield return new WaitForSeconds(time);
+
+        }
+        yield return null;
+            // goto next runpoint
+    }
+    IEnumerator FillByRows_1(List<Box> boxList, Background runPoint)
+    {
         float time = 0.5f;
 
 
@@ -90,7 +124,6 @@ public class Match3:MonoBehaviour
         yield return null;
             // goto next runpoint
     }
-
     private Box GetInnerMost(Background background)
     {
         Vector2Int pos;
