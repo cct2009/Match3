@@ -23,6 +23,8 @@ public struct GoalData
 
 public struct GridLayer
 {
+    public List<Background> enterPoints;
+    public List<Background> exitPoints;
     public int maxX, maxY;
     public Background[,] backgrounds;
 }

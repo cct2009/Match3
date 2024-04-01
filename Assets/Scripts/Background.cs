@@ -17,13 +17,17 @@ public class Background : MonoBehaviour
     public Vector2Int pos;
     public Box box;
     public Vector2Int flow;
+    public EPointType ptype;
     public EBackgroundType type;
+    public Background moveFrom;
+    public Background moveTo;
     static GridLayer gridLayer;
     static Background[,] backgrounds;
     
     private void Start() {
         gridLayer = Global.gridLayer;
         backgrounds = gridLayer.backgrounds; 
+        moveTo = moveFrom = null;
                
     }
   
@@ -160,11 +164,55 @@ public class Background : MonoBehaviour
     }
     public IEnumerator FlowBoxToBlank()
     {
-        Background canMoveBackground, blankBackground;
-        while (CanFlow(out canMoveBackground, out blankBackground) ) {
-            yield return canMoveBackground.FlowBlank(blankBackground);
+        List<List<Background>> allList = new List<List<Background>>();
+        List<List<Background>> dupList = new List<List<Background>>();
+        List<List<Background>> linesList = new List<List<Background>>();
+        foreach (Background background in gridLayer.enterPoints)
+        {
+            List<Background> lines;
+            lines = GetLines(background);
+            allList.Add(lines);
         }
-        FillInBlank();
+
+        // 
+        for (int i=0; i < allList.Count ;i++)
+        {
+            for (int j=i+1; j <allList.Count ; j++)
+            {
+                var result = allList[i].Where(x => allList[j].Contains(x));
+                if (result.Count() > 0)
+                {
+                    if (!dupList.Contains(allList[i])) dupList.Add(allList[i]);
+                    if (!dupList.Contains(allList[j])) dupList.Add(allList[j]);
+                }
+            }
+        }
+        for (int i =0; i < allList.Count;i++)
+        {
+            if (dupList.Contains(allList[i])) continue;
+            linesList.Add(allList[i]);
+        }
+        foreach(List<Background> list in dupList)
+        {
+            list.Reverse(); // so run from exit point to enter point
+        }
+        foreach(List<Background> list in linesList)
+        {
+            list.Reverse();
+        }
+        ResetFromTo();
+        foreach(List<Background> list in linesList)
+        {
+            StartCoroutine(flowPipe(list));
+        }
+        foreach(List<Background> list in dupList)
+        {
+            yield return flowPipe(list);
+            ResetFromTo();
+//            yield return new WaitForSeconds(2f);
+        }
+        yield return new WaitForSeconds(0.2f);
+        Main.Instance.match3.FillInBlank();
         List<MatchInfo> mifList = new List<MatchInfo>();
 
         if (GetAllMatch(ref mifList))
@@ -172,23 +220,128 @@ public class Background : MonoBehaviour
             yield return DestroyMatch(mifList);
             yield return FlowBoxToBlank();
         }
-            
-        
+        // yield return null;
     }
-    void FillInBlank()
+    void ResetFromTo()
     {
-        Background background;
-        for (int y = 0; y < gridLayer.maxY; y++)
+        for (int y=0; y < gridLayer.maxY; y++)
         {
-            for (int x = 0; x < gridLayer.maxX; x++)
+            for (int x =0; x < gridLayer.maxX; x++)
             {
-                background = backgrounds[x,y];
-                if (background.box == null) {
-                    background.box = Main.Instance.match3.NewJellyRandom(background);
-                    background.type = EBackgroundType.Fill;
+                Background background = backgrounds[x,y];
+                background.moveFrom = null;
+                background.moveTo = null;
+            }
+        }
+    }
+    IEnumerator flowPipe(List<Background> lineList)
+    {
+        List<Background> listMove = new List<Background>();
+        foreach(Background background in lineList)
+        {
+            if ((background.box == null && background.moveFrom == null)|| background.moveTo != null){
+                background.moveFrom = nextAvailBox(background, lineList);
+                if (background.moveFrom) {
+                    background.moveFrom.moveTo = background;
+                    listMove.Add(background);
                 }
             }
         }
+
+        foreach(Background background in listMove)
+        {
+           StartCoroutine(moveOnebyOne(background,background.moveFrom));
+        }
+         yield return null;
+
+    }
+    IEnumerator moveOnebyOne(Background background, Background moveFrom)
+    {
+        while (moveFrom != background && moveFrom )
+        {
+            moveFrom = moveFrom.moveNext();
+        }
+        yield return null;
+        
+    }
+    private Background moveNext()
+    {
+        Background next = getNext();
+        if (box && next){
+            box.transform.DOMove(next.transform.position,0.2f);
+            next.box = box;
+            box.background = next;
+            box = null;
+            
+        }
+            
+        return next;
+    }
+    Background nextAvailBox(Background background,List<Background> lineList)
+    {
+        int i;
+        for (i=0; i < lineList.Count; i++)
+            if (lineList[i] == background) break;
+        while (background.box == null || background.moveTo != null && i < lineList.Count)
+        {
+            i++;
+            if ( i >= lineList.Count) break;
+            background = lineList[i];
+            
+        }
+        return background;
+    }
+    Background getPrev()
+    {
+        Background background;
+        Vector2Int pos1 = pos - flow;
+        if (Global.ValidPos(pos1))
+            background = backgrounds[pos1.x,pos1.y];
+        else    
+            return null;
+
+        return background;
+    }
+    Background getNext()
+    {
+        Background background;
+        Vector2Int pos1 = pos + flow;
+        if (Global.ValidPos(pos1))
+            background = backgrounds[pos1.x,pos1.y];
+        else    
+            return null;
+        return background;
+    }
+    private List<Background> GetLines(Background enterPoint)
+    {   // get list of backgrounds in the same line from enterPoint to exitPoint
+        List<Background> lines = new List<Background>();
+        Vector2Int pos = enterPoint.pos;
+
+        while (Global.ValidPos(pos)) {
+            lines.Add(enterPoint);
+            pos = pos + enterPoint.flow;
+            if (Global.ValidPos(pos))
+                enterPoint = backgrounds[pos.x,pos.y];
+
+        }
+        return lines;
+    }
+    
+    public IEnumerator FlowBoxToBlank_1()
+    {
+        Background canMoveBackground, blankBackground;
+        while (CanFlow(out canMoveBackground, out blankBackground) ) {
+            yield return canMoveBackground.FlowBlank(blankBackground);
+        }
+        Main.Instance.match3.FillInBlank();
+        List<MatchInfo> mifList = new List<MatchInfo>();
+
+        if (GetAllMatch(ref mifList))
+        {
+            yield return DestroyMatch(mifList);
+            yield return FlowBoxToBlank_1();
+        }
+        
     }
 
     bool GetAllMatch(ref List<MatchInfo> mifList)

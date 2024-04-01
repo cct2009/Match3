@@ -569,10 +569,10 @@ MonoBehaviour:
   lr1: {fileID: 1325001882}
   lr2: {fileID: 1983304118}
   programState: 0
-  DirectionVersion: 1
+  DirectionVersion: 2
   level: {fileID: 370546175}
   flowSpeed: 0.1
-  dieSpeed: 0.5
+  dieSpeed: 0.25
   times: {fileID: 1686411486}
   goalTimes: {fileID: 1840741523}
   part: {fileID: 980362850053402522, guid: 8061b1f92e274c94e9b8220f4b54194b, type: 3}

@@ -133,7 +133,7 @@ public class Box : MonoBehaviour
 
     public IEnumerator launchPower4()
     {
-        float time = 0.3f;
+        float time = 1f;
         DestroyAnimateBox();
         GameObject panel = GameObject.Find("Panel");
         GameObject power4_1, power4_2;

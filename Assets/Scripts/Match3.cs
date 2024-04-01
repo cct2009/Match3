@@ -1,7 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 
+public enum EPointType 
+{
+    Enter = 0,
+    Exit = 1,
+    Flow = 2,
+    Close = 3,
+    Unknown = 4,
+
+}
 public class Match3:MonoBehaviour
 {
     public Box PrefabBox;
@@ -27,6 +37,92 @@ public class Match3:MonoBehaviour
         backgrounds = gridLayer.backgrounds;
     }
 
+
+    public void FillInBlank()
+    {
+        List<Box>[] sortBox = new List<Box>[gridLayer.enterPoints.Count];
+        int i = 0;
+        Box box;
+        SpriteRenderer sr;
+        float size=0f;
+        foreach(Background background in gridLayer.enterPoints)
+        {
+            sortBox[i] = new List<Box>();
+            if (background.box != null) { i++; continue; }
+            sr = background.GetComponent<SpriteRenderer>();
+            size = sr.size.x;
+            Vector2 incr1 = background.flow * new Vector2(-1,-1) * sr.bounds.size.x;
+            while ( (box = GetInnerMost(background)) != null)
+                sortBox[i].Add(box);
+            
+            Vector3 pos = background.transform.position;
+            Vector3 newPos = pos;
+            // ย้ายตำแหน่ง 
+            foreach(Box box1 in sortBox[i])
+            {
+                newPos += new Vector3(incr1.x,incr1.y,0);
+                box1.transform.position = newPos;
+            }
+            i++;
+        }
+
+        for (i=0; i < sortBox.Length; i++)
+        {
+            if (sortBox[i].Count > 0){
+                StartCoroutine(FillByRows(sortBox[i], gridLayer.enterPoints[i]));
+                Debug.Log("FillByRows with "+sortBox[i].Count+" items");
+            }
+                
+        }
+        
+        
+    }
+    IEnumerator FillByRows(List<Box> boxList, Background runPoint)
+    {
+        float time = 0.5f;
+
+
+        foreach(Box box in boxList)
+        {
+            box.transform.DOMove(box.background.transform.position,time);
+
+        }
+        yield return null;
+            // goto next runpoint
+    }
+
+    private Box GetInnerMost(Background background)
+    {
+        Vector2Int pos;
+        Background inner = background;
+        while (background.box == null)
+        {
+            inner = background;
+            pos  = background.pos + background.flow;
+            background = backgrounds[pos.x,pos.y];
+        }
+        if (inner.box == null)
+        {
+            inner.box = Main.Instance.match3.NewJellyRandom(inner);
+            return inner.box;
+        }
+        return null;
+    }
+    public void FillInBlank_1()
+    {
+        Background background;
+        for (int y = 0; y < gridLayer.maxY; y++)
+        {
+            for (int x = 0; x < gridLayer.maxX; x++)
+            {
+                background = backgrounds[x,y];
+                if (background.box == null) {
+                    background.box = Main.Instance.match3.NewJellyRandom(background);
+                    background.type = EBackgroundType.Fill;
+                }
+            }
+        }
+    }
     public void LoadDirection(int DirectionVersion)
     {
         if (file.onLoadDirection(DirectionVersion))
@@ -55,8 +151,68 @@ public class Match3:MonoBehaviour
 
             }
             Debug.Log("Load Direction successed");
+            InitPointType();
         }
 
+    }
+
+    private void InitPointType()
+    {
+
+        // reset all type
+        for (int y=0; y < gridLayer.maxY; y++)
+        {
+            for (int x=0; x< gridLayer.maxX; x++)
+            {
+                Background background = backgrounds[x,y];
+                background.ptype = background.type == EBackgroundType.Close? EPointType.Close: EPointType.Unknown;
+                if (background.ptype == EPointType.Unknown)
+                {
+                    if (!onePointTo(background))
+                    {
+                        gridLayer.enterPoints.Add(background);
+                        background.ptype = EPointType.Enter;
+                    }
+                        
+                    else if (!onePointFrom(background))
+                    {
+                        gridLayer.exitPoints.Add(background);
+                        background.ptype = EPointType.Exit;
+                    }
+                        
+                    else   
+                        background.ptype = EPointType.Flow;
+                }
+            }
+        }
+    }
+    private bool onePointTo(Background background)
+    {
+        foreach(Vector2Int dir in Global.dirs)
+        {
+            Vector2Int newPos = background.pos + dir;
+            if (!Global.ValidPos(newPos)) continue;
+            Background newBackground = backgrounds[newPos.x,newPos.y];
+            if (newBackground.type == EBackgroundType.Close) continue;
+            if (newPos + newBackground.flow == background.pos)
+                return true;
+
+        }
+        return false;
+    }
+    private bool onePointFrom(Background background)
+    {   
+        foreach(Vector2Int dir in Global.dirs)
+        {
+            Vector2Int newPos = background.pos + dir;
+            if (!Global.ValidPos(newPos)) continue;
+            Background newBackground = backgrounds[newPos.x,newPos.y];
+            if (newBackground.type == EBackgroundType.Close) continue;
+            if (background.pos + background.flow == newBackground.pos)
+                return true;
+
+        }
+        return false;
     }
     public void DrawBox()
     {

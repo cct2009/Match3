@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Global : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class Global : MonoBehaviour
         gridLayer = new GridLayer();
         gridLayer.backgrounds = new Background[file.boxData.rows, file.boxData.columns];
         backgrounds = gridLayer.backgrounds;
+        gridLayer.enterPoints = new List<Background>();
+        gridLayer.exitPoints = new List<Background>();
 
         gridLayer.maxX = file.boxData.columns;
         gridLayer.maxY = file.boxData.rows;
