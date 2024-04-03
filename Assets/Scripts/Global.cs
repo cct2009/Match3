@@ -8,6 +8,7 @@ public class Global : MonoBehaviour
      public static Background[,] backgrounds;
     public  FileData file;
     public SpriteMask spm;
+    public static List<MatchInfo> mifList;
     static public Vector2Int[] dirs = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down};
     private void Awake() {
         if (Instance == null)
@@ -28,6 +29,7 @@ public class Global : MonoBehaviour
 
         gridLayer.maxX = file.boxData.columns;
         gridLayer.maxY = file.boxData.rows;
+        mifList = new List<MatchInfo>();
 
     }
     public static bool ValidPos(Vector2Int pos)

@@ -60,7 +60,7 @@ public class Background : MonoBehaviour
                 SwapPosition(background2);    
                 yield return new WaitForSeconds(0.3f);
 
-                List<MatchInfo> mifList = new List<MatchInfo>();
+                Global.mifList.Clear();
 
                 if (box.IsPower4() || background2.box.IsPower4())
                 {
@@ -70,12 +70,12 @@ public class Background : MonoBehaviour
                     
                 else
                 {
-                    box.checkJellyMatch(ref mifList);
-                    background2.box.checkJellyMatch(ref mifList);
+                    box.checkJellyMatch();
+                    background2.box.checkJellyMatch();
                 }
 
 
-                if (mifList.Count == 0)
+                if (Global.mifList.Count == 0)
                 {
                     // SwapPosition(background2);  
                     // box.transform.DOMove(transform.position,0.3f).SetEase(Ease.OutCubic);
@@ -84,7 +84,7 @@ public class Background : MonoBehaviour
                 }
                 else
                 {
-                    yield return DestroyMatch(mifList); 
+                    yield return DestroyMatch(); 
                         
                     yield return FlowBoxToBlank();
                     Main.Instance.AddTimes(-1);
@@ -107,12 +107,12 @@ public class Background : MonoBehaviour
         }
         else if (box1.IsPower4())
         {
-            // box2.checkJellyMatch(ref mifList);
+            box2.checkJellyMatch();
             yield return box1.launchPower4();
         }
         else if (box2.IsPower4())
         {
-            // box1.checkJellyMatch(ref mifList);
+            box1.checkJellyMatch();
             yield return box2.launchPower4();
         }
         
@@ -126,13 +126,13 @@ public class Background : MonoBehaviour
         }
         else if (box1.IsPower4())
         {
-            box2.checkJellyMatch(ref mifList);
-            box1.checkPower4Match(ref mifList);
+            box2.checkJellyMatch();
+            box1.checkPower4Match();
         }
         else if (box2.IsPower4())
         {
-            box1.checkJellyMatch(ref mifList);
-            box2.checkPower4Match(ref mifList);
+            box1.checkJellyMatch();
+            box2.checkPower4Match();
         }
 
     }
@@ -178,11 +178,10 @@ public class Background : MonoBehaviour
         }
         yield return new WaitForSeconds(0.2f);
         Main.Instance.match3.FillInBlank();
-        List<MatchInfo> mifList = new List<MatchInfo>();
 
-        if (GetAllMatch(ref mifList))
+        if (GetAllMatch())
         {
-            yield return DestroyMatch(mifList);
+            yield return DestroyMatch();
             yield return FlowBoxToBlank();
         }
         // yield return null;
@@ -269,7 +268,7 @@ public class Background : MonoBehaviour
             return null;
         return background;
     }
-
+  
     
     public IEnumerator FlowBoxToBlank_1()
     {
@@ -280,31 +279,31 @@ public class Background : MonoBehaviour
         Main.Instance.match3.FillInBlank();
         List<MatchInfo> mifList = new List<MatchInfo>();
 
-        if (GetAllMatch(ref mifList))
+        if (GetAllMatch())
         {
-            yield return DestroyMatch(mifList);
+            yield return DestroyMatch();
             yield return FlowBoxToBlank_1();
         }
         
     }
 
-    bool GetAllMatch(ref List<MatchInfo> mifList)
+    bool GetAllMatch()
     {
         Background background;
-        mifList.Clear();
+        Global.mifList.Clear();
         for (int y = 0; y < gridLayer.maxY; y++)
         {
             for (int x = 0; x < gridLayer.maxX; x++)
             {
                 background = backgrounds[x,y];
                 if (background.box != null &&
-                    !ContainIn(background.box, mifList)) {
-                    background.box.checkJellyMatch(ref mifList);
+                    !ContainIn(background.box, Global.mifList)) {
+                    background.box.checkJellyMatch();
                 }
             }
         }
         
-        return mifList.Count > 0;
+        return Global.mifList.Count > 0;
     }
     bool ContainIn(Box box, List<MatchInfo> mifList)
     {
@@ -452,11 +451,11 @@ public class Background : MonoBehaviour
         }
     }
   
-    public IEnumerator DestroyMatch(List<MatchInfo> mifList)
+    public IEnumerator DestroyMatch()
     {
         List<Box> boxList = new List<Box>();
         // รวม matchInfo ทั้งหมดเข้าด้วยกัน เป็นรายการของ box ทั้งหมดที่จะโดนทำลายหรือไม่โดนเลย (เป็น live)
-        foreach(MatchInfo mif in mifList)
+        foreach(MatchInfo mif in Global.mifList)
         {
             boxList = boxList.Union(mif.boxList).Distinct().ToList();
         }
@@ -500,9 +499,10 @@ public class Background : MonoBehaviour
         }
         
     }
-    private Background  GetAtDir(Vector2Int dir)
+    public Background  GetAtDir(Vector2Int dir)
     {
         Vector2Int pos1 = pos+dir;
+        if (!Global.ValidPos(pos1)) return null;
         return backgrounds[pos1.x,pos1.y];
     }
 

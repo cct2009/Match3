@@ -180,16 +180,16 @@ public class Box : MonoBehaviour
     }
             
     
-    public void checkPower4Match(ref List<MatchInfo> mifList)
+    public void checkPower4Match()
     {
         if (!IsPower4()) return;
         if (type == BoxType.PowerUpVer)
-            matchEntireCol(ref mifList);
+            matchEntireCol();
         else
-            matchEntireRow(ref mifList);
+            matchEntireRow();
     }
 
-    private void matchEntireCol(ref List<MatchInfo> mifList)
+    private void matchEntireCol()
     {
         List<Box> boxList = new List<Box>();
         for (int row = 0; row < gridLayer.maxY; row++)
@@ -207,12 +207,12 @@ public class Box : MonoBehaviour
         MatchInfo mif = new MatchInfo();
         mif.type = EMatchType.COL;
         mif.boxList = boxList;
-        mifList.Add(mif);
+        Global.mifList.Add(mif);
 
 
     }
 
-    private void matchEntireRow(ref List<MatchInfo> mifList)
+    private void matchEntireRow()
     {
         List<Box> boxList = new List<Box>();
         for (int col = 0; col < gridLayer.maxX; col++)
@@ -230,11 +230,11 @@ public class Box : MonoBehaviour
         MatchInfo mif = new MatchInfo();
         mif.type = EMatchType.COL;
         mif.boxList = boxList;
-        mifList.Add(mif);
+        Global.mifList.Add(mif);
 
         
     }
-    public void checkJellyMatch(ref List<MatchInfo> mifList,bool tranzform=true)
+    public void checkJellyMatch(bool tranzform=true)
     {
         if (!isJelly()) return;
 
@@ -263,7 +263,7 @@ public class Box : MonoBehaviour
                 mif.boxList.Add(this);
                 if (tranzform)
                     TranzformMatch(ref mif);
-                mifList.Add(mif);
+                Global.mifList.Add(mif);
                 Main.Instance.match3.PrintMatchInfo(mif);
             }
 

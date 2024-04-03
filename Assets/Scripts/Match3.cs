@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Collections;
+using Unity.Collections;
 
 public enum EPointType 
 {
@@ -12,6 +13,9 @@ public enum EPointType
     Unknown = 4,
 
 }
+
+
+
 public class Match3:MonoBehaviour
 {
     public Box PrefabBox;
@@ -20,6 +24,66 @@ public class Match3:MonoBehaviour
     GridLayer gridLayer;
     Background[,] backgrounds;
 
+    private static  List<List<Vector2Int>> match3_1 =
+        new List<List<Vector2Int>>()
+        {
+              new List<Vector2Int> {Vector2Int.right},
+              new List<Vector2Int> {Vector2Int.left, Vector2Int.up, Vector2Int.down},
+              new List<Vector2Int> {Vector2Int.zero},
+              new List<Vector2Int> {Vector2Int.zero},
+        };
+    private static  List<List<Vector2Int>> match3_2 =
+        new List<List<Vector2Int>>()
+        {
+            new List<Vector2Int> {Vector2Int.right},
+             new List<Vector2Int> {Vector2Int.zero},
+              new List<Vector2Int> {Vector2Int.up,Vector2Int.down},
+              new List<Vector2Int> {Vector2Int.zero},
+        };        
+    private static  List<List<Vector2Int>> match3_3 =
+        new List<List<Vector2Int>>()
+        {
+            new List<Vector2Int> {Vector2Int.right},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.right, Vector2Int.up, Vector2Int.down},
+        };  
+    private static  List<List<Vector2Int>> match3_4 =
+    new List<List<Vector2Int>>()
+    {
+            new List<Vector2Int> {Vector2Int.up},
+            new List<Vector2Int> {Vector2Int.up,Vector2Int.right,Vector2Int.left},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.zero},
+    };  
+
+    private static  List<List<Vector2Int>> match3_5 =
+    new List<List<Vector2Int>>()
+    {
+            new List<Vector2Int> {Vector2Int.up},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.left, Vector2Int.right},
+            new List<Vector2Int> {Vector2Int.zero},
+    };  
+    private static  List<List<Vector2Int>> match3_6 =
+    new List<List<Vector2Int>>()
+    {
+            new List<Vector2Int> {Vector2Int.up},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.zero},
+            new List<Vector2Int> {Vector2Int.left,Vector2Int.right, Vector2Int.down},
+    };  
+
+    List<List<Vector2Int>>[] matchAll1 = new List<List<Vector2Int>>[]
+    {
+        match3_3
+    };
+    List<List<Vector2Int>>[] matchAll = new List<List<Vector2Int>>[]
+    {
+        match3_1,match3_2,match3_3, match3_4,match3_5,match3_6
+    };
+    string[] matchName = { "match3_1","match3_2","match3_3","match3_4","match3_5","match3_6"};
+    
     private void Awake() {
         DOTween.Init();   
         
@@ -494,7 +558,119 @@ public class Match3:MonoBehaviour
           return createBox(background, subType);
     }
 
+    private void printResults(List<List<Background>> list)
+    {
+        string line = "";
+        Debug.Log("Total Match Found "+list.Count + " Sets");
+        foreach(List<Background> lst1 in list)
+        {
+            line = "";
+            foreach(Background bck in lst1)
+            {
+                line += bck.box.name + ",";
+            }
+            Debug.Log(line);
+        }
+
+    }
     public void ShowCanMatch()
+    {
+        List<List<Background>> resultList;
+        int i=0;
+        foreach (List<List<Vector2Int>> list in matchAll)
+        {
+            resultList = CheckAllMatch(list);
+            if (resultList != null) {
+                Debug.Log("=========================");
+                Debug.Log(matchName[i]);
+                Debug.Log("=========================");
+                printResults(resultList);
+            }
+                
+            i++;
+        }
+        
+   
+    }
+
+    private List<List<Background>> CheckAllMatch(List<List<Vector2Int>> list)
+    {
+        List<List<Background>> resultList = new List<List<Background>>();
+        for (int y =0; y < gridLayer.maxY; y++)
+        {
+            for (int x = 0; x < gridLayer.maxX; x++)
+            {
+                Background background = backgrounds[x,y];
+                List<Background> bkList = CheckMatch(background, list);
+                if (bkList != null)
+                    resultList.Add(bkList);
+            }
+        }
+        if (resultList.Count == 0)
+            return null;
+        return resultList;
+
+    }
+    private List<Background> CheckMatch(Background background, List<List<Vector2Int>> list)
+    {
+        List<Background> bkList = new List<Background>();
+        Vector2Int moveDir,curPos;
+        Background curBackground=null;
+        int numMatch = 0;
+        bool found = false;
+        int i=0;
+
+        if (background.box == null) return null;
+        BoxType boxType = background.box.type;
+        moveDir = Vector2Int.right; 
+        curPos = background.pos;
+        curBackground = background;
+
+        foreach(List<Vector2Int> listVec in list)
+        {
+            if (i == 0) {
+                moveDir = listVec[0];
+                numMatch = list.Count - 1;
+                i++;
+                continue;
+            }
+            if (listVec.Count > 1) { // เป็นตำแหน่งที่เลื่อนแล้วทำให้เกิดการ match ซึ่งจะมีได้หลายตำแหน่ง
+                found = false;
+                foreach(Vector2Int vec in listVec)
+                {
+                    Background chkBackground = curBackground.GetAtDir(vec);
+                    if (chkBackground == null) continue;
+                    if (chkBackground.box.type == boxType) {
+                        bkList.Add(chkBackground);
+                        found = true;
+                        break;   // เจออันที่ match อันแรก ใช้อันนี้เลย
+                        
+                    }
+                }
+                if (!found) return null;
+            }  
+            else if (listVec.Count == 1)
+            {
+               Background chkBackground = curBackground.GetAtDir(listVec[0]); 
+               if (chkBackground.box.type == boxType) {
+                    bkList.Add(chkBackground);
+               }
+            }
+            i++;
+            if (i <= list.Count-1)
+            {
+                curBackground = curBackground.GetAtDir(moveDir);
+                if (!curBackground) return null;
+            }
+            
+            
+        }
+        
+        if (bkList.Count == numMatch)
+            return bkList;
+        return null;
+    }
+    public void ShowCanMatch_1()
     {
         Background background;
         bool exit = false;
@@ -514,7 +690,7 @@ public class Match3:MonoBehaviour
                         background.SwapPosition(nextBackground);
 
                         List<MatchInfo> mifList = new List<MatchInfo>();
-                        background.box.checkJellyMatch(ref mifList, false);
+                        background.box.checkJellyMatch(false);
                         if (mifList.Count > 0) {
                             PrintMIFList(mifList);
                             background.SwapPosition(nextBackground);
