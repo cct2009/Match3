@@ -184,7 +184,7 @@ public class Background : MonoBehaviour
             yield return DestroyMatch();
             yield return FlowBoxToBlank();
         }
-        // yield return null;
+        yield return null;
     }
 
     

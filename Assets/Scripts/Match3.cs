@@ -180,7 +180,7 @@ public class Match3:MonoBehaviour
             
             Vector3 pos = background.transform.position;
             Vector3 newPos = pos;
-            // ย้ายตำแหน่ง 
+            // ย้ายตำแหน่ง ในสุดจะย้ายไปที่ตำแหน่ง enterPoint-1,ตำแหน่งถัดไปก็ย้ายไปตำแหน่ง enterPoint-2,....
             foreach(Box box1 in sortBox[i])
             {
                 newPos += new Vector3(incr1.x,incr1.y,0);
@@ -202,13 +202,13 @@ public class Match3:MonoBehaviour
     }
     IEnumerator FillByRows(List<Box> boxList, Background runPoint)
     {
-        float time = 0.1f;
+        float time = 0.3f;
         List<Background> backList = new List<Background>();
 
 
         SpriteRenderer sr = runPoint.GetComponent<SpriteRenderer>();
         Vector2 incr = runPoint.flow * new Vector2(1,1) * sr.bounds.size.x;
-
+        
         for (int i = 0; i < boxList.Count; i++)
         {
             backList.Add(runPoint);
@@ -218,9 +218,9 @@ public class Match3:MonoBehaviour
                 Box box = boxList[j];
                 Vector3 pos;
                 if (j < backList.Count)
-                    pos = backList[j].transform.position;
+                    pos = backList[j].transform.position; // อันที่เดินถึง enterPoint แล้วให้เดินไปตาม enterPoint
                 else
-                    pos = box.transform.position + new Vector3(incr.x, incr.y,0);
+                    pos = box.transform.position + new Vector3(incr.x, incr.y,0); // อันที่ยังเดินไม่ถึง enterpoint ให้เดินตามทิศแรกของ enterpoint
                 
                 box.transform.DOMove(pos, time);
             }
@@ -228,34 +228,23 @@ public class Match3:MonoBehaviour
             runPoint = runPoint.getNext();
             if (runPoint == null)
                 Debug.Log("Program Bug!! it must not be null");
-            yield return new WaitForSeconds(time);
+            yield return new WaitForSeconds(time*1.2f);
 
         }
         yield return null;
             // goto next runpoint
     }
-    IEnumerator FillByRows_1(List<Box> boxList, Background runPoint)
-    {
-        float time = 0.5f;
 
-
-        foreach(Box box in boxList)
-        {
-            box.transform.DOMove(box.background.transform.position,time);
-
-        }
-        yield return null;
-            // goto next runpoint
-    }
     private Box GetInnerMost(Background background)
     {
-        Vector2Int pos;
         Background inner = background;
         while (background.box == null)
         {
             inner = background;
-            pos  = background.pos + background.flow;
-            background = backgrounds[pos.x,pos.y];
+            background = background.getNext();
+            if (background == null)
+                break;
+            
         }
         if (inner.box == null)
         {
@@ -264,21 +253,7 @@ public class Match3:MonoBehaviour
         }
         return null;
     }
-    public void FillInBlank_1()
-    {
-        Background background;
-        for (int y = 0; y < gridLayer.maxY; y++)
-        {
-            for (int x = 0; x < gridLayer.maxX; x++)
-            {
-                background = backgrounds[x,y];
-                if (background.box == null) {
-                    background.box = Main.Instance.match3.NewJellyRandom(background);
-                    background.type = EBackgroundType.Fill;
-                }
-            }
-        }
-    }
+
     public void LoadDirection(int DirectionVersion)
     {
         if (file.onLoadDirection(DirectionVersion))
@@ -314,7 +289,8 @@ public class Match3:MonoBehaviour
 
     private void InitPointType()
     {
-
+        gridLayer.enterPoints.Clear();
+        gridLayer.exitPoints.Clear();
         // reset all type
         for (int y=0; y < gridLayer.maxY; y++)
         {

@@ -569,7 +569,7 @@ MonoBehaviour:
   lr1: {fileID: 1325001882}
   lr2: {fileID: 1983304118}
   programState: 0
-  DirectionVersion: 2
+  DirectionVersion: 1
   level: {fileID: 370546175}
   flowSpeed: 0.1
   dieSpeed: 0.25
